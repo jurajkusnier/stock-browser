@@ -18,4 +18,7 @@ interface InstrumentsDao {
     @Query("SELECT * FROM instruments WHERE symbol IN (:symbols)")
     fun findSymbols(symbols: List<String>): Flow<List<InstrumentEntity>>
 
+    @Query("SELECT * FROM instruments WHERE symbol == :symbol")
+    fun getInstrument(symbol: String): Flow<InstrumentEntity?>
+
 }

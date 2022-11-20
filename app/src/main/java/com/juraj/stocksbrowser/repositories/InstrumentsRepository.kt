@@ -9,7 +9,7 @@ import javax.inject.Inject
 class InstrumentsRepository @Inject constructor(private val instrumentsDao: InstrumentsDao) {
 
     suspend fun insertInstrument(instrumentEntity: InstrumentEntity) =
-            instrumentsDao.insert(instrumentEntity)
+        instrumentsDao.insert(instrumentEntity)
 
 
     fun findInstruments(symbols: List<String>): Flow<List<InstrumentEntity>> =
@@ -17,5 +17,8 @@ class InstrumentsRepository @Inject constructor(private val instrumentsDao: Inst
 
     suspend fun searchInstruments(text: String): List<InstrumentEntity> =
         instrumentsDao.findByName(text.toAlphaNumericString() + "%")
+
+    fun getInstrument(symbol: String): Flow<InstrumentEntity?> =
+        instrumentsDao.getInstrument(symbol)
 
 }

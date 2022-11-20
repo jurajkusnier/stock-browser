@@ -1,11 +1,12 @@
 package com.juraj.stocksbrowser.navigation
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.juraj.stocksbrowser.ui.detail.DetailScreen
 import com.juraj.stocksbrowser.ui.home.HomeScreen
 
 @Composable
@@ -15,7 +16,7 @@ fun AppNavHost(navController: NavHostController) {
             HomeScreen(hiltViewModel(), navController)
         }
         composable(route = NavDestinations.Details.url) {
-            Text("Welcome to detail of ${it.arguments}")
+            DetailScreen(hiltViewModel(), navController)
         }
     }
 }
@@ -24,5 +25,6 @@ sealed class NavDestinations(val url: String) {
     object Home : NavDestinations("home")
     object Details : NavDestinations("details?symbol={symbol}") {
         fun uri(symbol: String) = url.replace("{symbol}", symbol)
+        fun getSymbol(savedStateHandle: SavedStateHandle):String? = savedStateHandle["symbol"]
     }
 }
