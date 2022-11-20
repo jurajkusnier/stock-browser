@@ -4,6 +4,7 @@ import com.juraj.stocksbrowser.data.InstrumentEntity
 
 data class HomeScreenState(
     val isLoading: Boolean = true,
+    val textFieldValue:String = "",
     val list: List<ListItem> = emptyList()
 )
 

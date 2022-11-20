@@ -1,9 +1,6 @@
 package com.juraj.stocksbrowser.ui.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.LinearProgressIndicator
@@ -17,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.juraj.stocksbrowser.SearchTextField
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.ui.theme.StockListHeaderItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
@@ -25,8 +21,10 @@ import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
     viewModel.viewState.observeAsState().value?.let { viewState ->
-        HomeScreen(viewState) {
+        HomeScreen(viewState, {
             navController.navigate(NavDestinations.Details.uri(it.symbol))
+        }) {
+            viewModel.setTextFieldValue(it)
         }
     }
 }
@@ -34,30 +32,35 @@ fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
 @Composable
 private fun HomeScreen(
     state: HomeScreenState,
-    openStockDetails: (ListItem.InstrumentItem) -> Unit
+    openStockDetails: (ListItem.InstrumentItem) -> Unit,
+    setTextFieldValue: (String) -> Unit
 ) {
     Scaffold(topBar = {
         TopAppBar {
             Text("Stocks Browser")
         }
     }) { paddingValue ->
-        Column(
+        Box(
             Modifier
                 .fillMaxWidth()
-                .padding(paddingValue),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(paddingValue)
         ) {
+            Column(
+                Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                SearchTextField(state.textFieldValue, setTextFieldValue)
+
+                LazyColumn {
+                    state.list.forEachIndexed { index, listItem ->
+                        addListItem(listItem, openStockDetails)
+                    }
+                }
+            }
 
             if (state.isLoading) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-
-            SearchTextField { }
-
-            LazyColumn {
-                state.list.forEachIndexed { index, listItem ->
-                    addListItem(listItem, openStockDetails)
-                }
             }
         }
     }
@@ -112,7 +115,7 @@ fun HomeScreen_Preview() {
                         assetType = "ETF"
                     )
                 )
-            )
+            ), {}
         ) {}
     }
 }

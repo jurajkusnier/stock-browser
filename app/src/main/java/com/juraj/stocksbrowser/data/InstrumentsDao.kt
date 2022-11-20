@@ -12,7 +12,7 @@ interface InstrumentsDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(instrumentEntity: InstrumentEntity)
 
-    @Query("SELECT * FROM instruments WHERE name LIKE :name")
+    @Query("SELECT * FROM instruments WHERE name LIKE :name OR symbol LIKE :name")
     suspend fun findByName(name: String): List<InstrumentEntity>
 
     @Query("SELECT * FROM instruments WHERE symbol IN (:symbols)")
