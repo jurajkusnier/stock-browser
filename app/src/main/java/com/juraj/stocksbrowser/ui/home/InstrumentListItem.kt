@@ -13,29 +13,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 
-
-data class StockInfo(
-    val symbol: String,
-    val name: String,
-    val exchange: String,
-    val assetType: String
-)
-
 @Composable
-fun StockListItem(stockInfo: StockInfo, onClick: (StockInfo) -> Unit) {
+fun InstrumentListItem(instrumentItem: ListItem.InstrumentItem, onClick: (ListItem.InstrumentItem) -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
-            .clickable { onClick(stockInfo) }
+            .clickable { onClick(instrumentItem) }
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
         Text(
-            stockInfo.symbol,
+            instrumentItem.symbol,
             style = MaterialTheme.typography.body1,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            stockInfo.name,
+            instrumentItem.name,
             style = MaterialTheme.typography.body2,
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
@@ -46,10 +38,10 @@ fun StockListItem(stockInfo: StockInfo, onClick: (StockInfo) -> Unit) {
 
 @Preview(showBackground = true, widthDp = 400)
 @Composable
-fun StockListItem_Preview() {
+fun InstrumentListItem_Preview() {
     StocksBrowserTheme {
-        StockListItem(
-            StockInfo(
+        InstrumentListItem(
+            ListItem.InstrumentItem(
                 symbol = "IBM",
                 name = "International Business Machines Corp",
                 exchange = "NYSE",

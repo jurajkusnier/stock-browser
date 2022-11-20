@@ -1,37 +1,53 @@
 package com.juraj.stocksbrowser.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.juraj.stocksbrowser.usecases.AreSymbolsUpdatedUseCase
+import com.juraj.stocksbrowser.usecases.GetMostPopularEtfsUseCase
+import com.juraj.stocksbrowser.usecases.GetMostPopularStocksUseCase
+import com.juraj.stocksbrowser.usecases.UpdateSymbolsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeScreenViewModel : ViewModel() {
+@HiltViewModel
+class HomeScreenViewModel @Inject constructor(
+    updateSymbolsUseCase: UpdateSymbolsUseCase,
+    getMostPopularStocksUseCase: GetMostPopularStocksUseCase,
+    getMostPopularEtfsUseCase: GetMostPopularEtfsUseCase,
+    private val areSymbolsUpdatedUseCase: AreSymbolsUpdatedUseCase
+) : ViewModel() {
 
-    private val _state = MutableLiveData<HomeScreenState>()
-    val state: LiveData<HomeScreenState>
-        get() = _state
+    private val symbolsUpdateInProgress = MutableStateFlow(false)
+
+    val viewState = combine(
+        getMostPopularStocksUseCase(),
+        getMostPopularEtfsUseCase(),
+        symbolsUpdateInProgress
+    ) { mostPopularStocks, mostPopularEtfs, loading ->
+        HomeScreenState(
+            isLoading = loading,
+            list = mutableListOf<ListItem>().apply {
+                if (mostPopularStocks.isNotEmpty()) {
+                    add(ListItem.HeaderItem(HeaderType.MostPopularStocks))
+                    addAll(mostPopularStocks.map { it.toInstrumentItem() })
+                }
+
+                if (mostPopularEtfs.isNotEmpty()) {
+                    add(ListItem.HeaderItem(HeaderType.MostPopularEtfs))
+                    addAll(mostPopularEtfs.map { it.toInstrumentItem() })
+                }
+            }
+        )
+    }.asLiveData()
 
     init {
-        _state.value = HomeScreenState(
-            favorites = listOf(
-                StockInfo(
-                    symbol = "IBM",
-                    name = "International Business Machines Corp",
-                    exchange = "NYSE",
-                    assetType = "Stock"
-                ),
-                StockInfo(
-                    symbol = "TSLA",
-                    name = "Tesla Inc",
-                    exchange = "NYSE",
-                    assetType = "Stock"
-                ),
-                StockInfo(
-                    symbol = "CID",
-                    name = "VICTORYSHARES INTERNATIONAL HIGH DIV VOLATILITY WTD ETF ",
-                    exchange = "NASDAQ",
-                    assetType = "ETF"
-                )
-            )
-        )
+        viewModelScope.launch {
+            if (!areSymbolsUpdatedUseCase().first()) {
+                symbolsUpdateInProgress.tryEmit(true)
+                updateSymbolsUseCase()
+            }
+            symbolsUpdateInProgress.tryEmit(false)
+        }
     }
 }
