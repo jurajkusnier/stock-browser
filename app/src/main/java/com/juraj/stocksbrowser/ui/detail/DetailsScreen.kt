@@ -11,7 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.juraj.stocksbrowser.ui.home.ListItem
+import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
+import com.juraj.stocksbrowser.ui.home.screen.ListItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 
 @Composable
@@ -47,8 +48,9 @@ fun DetailScreen_Preview() {
                 ListItem.InstrumentItem(
                     symbol = "IBM",
                     name = "International Business Machines Corp",
-                    exchange = "NYSE",
-                    assetType = "Stock"
+                    lastSalePrice = "$15.8",
+                    percentageChange = "0.5%",
+                    deltaIndicator = DeltaIndicator.Up
                 )
             )
         ) {}

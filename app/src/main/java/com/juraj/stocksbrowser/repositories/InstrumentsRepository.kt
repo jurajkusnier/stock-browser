@@ -2,7 +2,7 @@ package com.juraj.stocksbrowser.repositories
 
 import com.juraj.stocksbrowser.data.InstrumentEntity
 import com.juraj.stocksbrowser.data.InstrumentsDao
-import com.juraj.stocksbrowser.utils.toAlphaNumericString
+import com.juraj.stocksbrowser.utils.toSafeString
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class InstrumentsRepository @Inject constructor(private val instrumentsDao: Inst
         instrumentsDao.findSymbols(symbols)
 
     suspend fun searchInstruments(text: String): List<InstrumentEntity> =
-        instrumentsDao.findByName(text.toAlphaNumericString() + "%")
+        instrumentsDao.findByName(text.toSafeString() + "%")
 
     fun getInstrument(symbol: String): Flow<InstrumentEntity?> =
         instrumentsDao.getInstrument(symbol)

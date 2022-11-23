@@ -1,15 +1,16 @@
 package com.juraj.stocksbrowser.usecases
 
-import com.juraj.stocksbrowser.data.InstrumentEntity
-import com.juraj.stocksbrowser.repositories.InstrumentsRepository
+import com.juraj.stocksbrowser.data.StockEntity
+import com.juraj.stocksbrowser.repositories.StocksRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SearchStocksAndEtfsUseCase @Inject constructor(
-    private val instrumentsRepository: InstrumentsRepository
+    private val stocksRepository: StocksRepository
 ) {
 
-    suspend operator fun invoke(text:String): List<InstrumentEntity> {
-        return instrumentsRepository.searchInstruments(text)
+    operator fun invoke(text:String): Flow<List<StockEntity>> {
+        return stocksRepository.findStocks(text)
     }
 
 }

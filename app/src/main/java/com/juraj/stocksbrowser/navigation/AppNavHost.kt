@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.juraj.stocksbrowser.ui.detail.DetailScreen
-import com.juraj.stocksbrowser.ui.home.HomeScreen
+import com.juraj.stocksbrowser.ui.home.screen.HomeScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {

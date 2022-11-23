@@ -11,8 +11,10 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.juraj.stocksbrowser.api.ApiService
+import com.juraj.stocksbrowser.api.NasdaqApiService
 import com.juraj.stocksbrowser.data.AppDatabase
 import com.juraj.stocksbrowser.data.InstrumentsDao
+import com.juraj.stocksbrowser.data.StocksDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,24 +25,71 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.io.File
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
+
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
+    @Singleton
+    @Provides
+    fun provideJson(): Json {
+        return Json {
+            ignoreUnknownKeys = true
+        }
+    }
+
+    @Provides
+    fun provideNasdaqApiService(
+        json: Json,
+        httpClient: OkHttpClient
+    ): NasdaqApiService {
+        return Retrofit.Builder()
+            .baseUrl(NASDAQ_BASE_URL)
+            .client(httpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(NasdaqApiService::class.java)
+    }
+
     @Provides
     fun provideStockApiService(
+        json: Json,
         @BaseUrl baseUrl: String
     ): ApiService {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(ApiService::class.java)
+    }
+
+    @Provides
+    fun provideHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            setLevel(HttpLoggingInterceptor.Level.HEADERS)
+        }
+
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
+                val requestWithUserAgent = chain.request()
+                    .newBuilder()
+                    .header(
+                        "User-Agent",
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:107.0) Gecko/20100101 Firefox/107.0"
+                    )
+                    .build()
+                chain.proceed(requestWithUserAgent)
+            }
+            .build()
     }
 
     @Provides
@@ -68,6 +117,10 @@ class AppModule {
         appDatabase.instrumentsDao()
 
     @Provides
+    fun provideStocksDao(appDatabase: AppDatabase): StocksDao =
+        appDatabase.stocksDao()
+
+    @Provides
     fun provideCacheDir(@ApplicationContext applicationContext: Context): File =
         applicationContext.cacheDir
 
@@ -77,6 +130,7 @@ class AppModule {
 
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8080"
+        private const val NASDAQ_BASE_URL = "https://api.nasdaq.com"
         private const val USER_PREFERENCES = "settings"
         private const val DATABSE_NAME = "main-database"
     }

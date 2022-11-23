@@ -76,7 +76,11 @@ dependencies {
     implementation "io.coil-kt:coil-compose:2.2.1"
     implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
     kapt 'com.google.dagger:hilt-compiler:2.44'
-
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    implementation "org.orbit-mvi:orbit-core:4.4.0"
+    implementation "org.orbit-mvi:orbit-viewmodel:4.4.0"
+    implementation "org.orbit-mvi:orbit-compose:4.4.0"
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'

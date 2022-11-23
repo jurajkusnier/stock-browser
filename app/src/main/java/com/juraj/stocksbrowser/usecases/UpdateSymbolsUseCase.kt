@@ -1,11 +1,11 @@
 package com.juraj.stocksbrowser.usecases
 
-import android.util.Log
 import com.juraj.stocksbrowser.api.ApiService
 import com.juraj.stocksbrowser.data.InstrumentEntity
 import com.juraj.stocksbrowser.repositories.InstrumentsRepository
 import com.juraj.stocksbrowser.repositories.PreferencesRepository
 import okhttp3.ResponseBody
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
@@ -63,8 +63,8 @@ class UpdateSymbolsUseCase @Inject constructor(
                 output.flush()
             }
             return file
-        } catch (e: Exception) {
-            Log.e("UpdateSymbolsUseCase", e.toString())
+        } catch (exception: Exception) {
+            Timber.e(exception)
         } finally {
             input?.close()
         }
