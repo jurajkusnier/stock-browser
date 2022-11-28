@@ -31,3 +31,12 @@ fun StockDto.toStockEntity() = StockEntity(
     industry = industry,
     sector = sector
 )
+
+fun StockEntity.extractDetails(): List<Pair<String, String>> {
+    return mutableListOf<Pair<String, String>>().apply {
+        add(Pair("Industry", industry))
+        add(Pair("Sector", sector))
+        add(Pair("Country", country))
+        add(Pair("IPO Year", ipoyear.toString()))
+    }
+}

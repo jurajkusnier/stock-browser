@@ -12,6 +12,7 @@ import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.juraj.stocksbrowser.api.ApiService
 import com.juraj.stocksbrowser.api.NasdaqApiService
+import com.juraj.stocksbrowser.api.YahooApiService
 import com.juraj.stocksbrowser.data.AppDatabase
 import com.juraj.stocksbrowser.data.InstrumentsDao
 import com.juraj.stocksbrowser.data.StocksDao
@@ -43,6 +44,19 @@ class AppModule {
         return Json {
             ignoreUnknownKeys = true
         }
+    }
+
+    @Provides
+    fun provideYahooApiService(
+        json: Json,
+        httpClient: OkHttpClient
+    ): YahooApiService {
+        return Retrofit.Builder()
+            .baseUrl(YAHOO_BASE_URL)
+            .client(httpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(YahooApiService::class.java)
     }
 
     @Provides
@@ -131,6 +145,7 @@ class AppModule {
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8080"
         private const val NASDAQ_BASE_URL = "https://api.nasdaq.com"
+        private const val YAHOO_BASE_URL = "https://query1.finance.yahoo.com"
         private const val USER_PREFERENCES = "settings"
         private const val DATABSE_NAME = "main-database"
     }

@@ -6,26 +6,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.juraj.stocksbrowser.navigation.NavDestinations
-import com.juraj.stocksbrowser.ui.theme.StockListHeaderItem
-import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
-import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem
 import com.juraj.stocksbrowser.ui.home.SearchTextField
 import com.juraj.stocksbrowser.ui.home.SearchTextField2
+import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem3
+import com.juraj.stocksbrowser.ui.home.components.StockListHeaderItem
+import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -61,8 +57,7 @@ private fun HomeScreen(
             .fillMaxWidth()
     ) {
         Scaffold(topBar = {
-            SimpleTopAppBar(elevation = if (scrolledListState || state.isSearching) 4.dp else 0.dp) {
-
+            SimpleTopAppBar(scrolledListState || state.isSearching) {
                 AnimatedVisibility(
                     visible = state.isSearching,
                     enter = fadeIn(),
@@ -105,8 +100,7 @@ private fun HomeScreen(
                         ) {
                             Text(
                                 "Stocks Browser",
-                                style = MaterialTheme.typography.body1,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.h1
                             )
                         }
 
@@ -128,8 +122,11 @@ private fun HomeScreen(
                 LazyColumn(state = lazyListState) {
                     state.sections.flatMap { (_, value) ->
                         if (value.isVisible) value.data else emptyList()
-                    }.map { listItem ->
-                        addListItem(listItem) { action(HomeScreenIntent.OpenDetail(it.symbol)) }
+                    }.windowed(size = 2, step = 1, true) { listItems ->
+                        addListItem(listItems.first()) { action(HomeScreenIntent.OpenDetail(it.symbol)) }
+                        if (listItems.size == 2 && listItems.first() is ListItem.InstrumentItem && listItems.last() is ListItem.InstrumentItem) {
+                            addDivider()
+                        }
                     }
                 }
             }
@@ -140,6 +137,16 @@ private fun HomeScreen(
     }
 }
 
+private fun LazyListScope.addDivider() {
+    item {
+        Divider(
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+            thickness = 1.dp,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+    }
+}
+
 private fun LazyListScope.addListItem(
     listItem: ListItem,
     onClick: (ListItem.InstrumentItem) -> Unit
@@ -147,7 +154,7 @@ private fun LazyListScope.addListItem(
     item {
         when (listItem) {
             is ListItem.HeaderItem -> StockListHeaderItem(listItem.readableType())
-            is ListItem.InstrumentItem -> InstrumentListItem(listItem, onClick)
+            is ListItem.InstrumentItem -> InstrumentListItem3(listItem, onClick)
             ListItem.ShimmerItem -> TODO()
         }
     }

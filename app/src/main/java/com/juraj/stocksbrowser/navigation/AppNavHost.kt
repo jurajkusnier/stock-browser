@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.juraj.stocksbrowser.ui.detail.DetailScreen
+import com.juraj.stocksbrowser.ui.detail.screen.DetailScreen
 import com.juraj.stocksbrowser.ui.home.screen.HomeScreen
 
 @Composable

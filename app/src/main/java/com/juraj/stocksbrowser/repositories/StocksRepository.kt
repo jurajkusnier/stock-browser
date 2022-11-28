@@ -15,6 +15,9 @@ class StocksRepository @Inject constructor(
     fun getStocks(symbols: List<String>) =
         stocksDao.getStocksBySymbols(symbols)
 
+    fun getStock(symbol: String) =
+        stocksDao.getStockBySymbol(symbol)
+
     fun findStocks(searchQuery: String) =
         stocksDao.findStocks(searchQuery.toSafeString() + "%")
 

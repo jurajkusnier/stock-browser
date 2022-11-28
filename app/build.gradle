@@ -81,6 +81,7 @@ dependencies {
     implementation "org.orbit-mvi:orbit-viewmodel:4.4.0"
     implementation "org.orbit-mvi:orbit-compose:4.4.0"
     implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation "com.himanshoe:charty:1.0.1"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'

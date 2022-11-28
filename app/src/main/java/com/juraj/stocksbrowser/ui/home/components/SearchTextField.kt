@@ -26,7 +26,7 @@ fun SearchTextField(onClick: () -> Unit) {
             value = "",
             maxLines = 1,
             singleLine = true,
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.large,
             onValueChange = {},
             leadingIcon = {
                 Icon(Icons.Default.Search, null)

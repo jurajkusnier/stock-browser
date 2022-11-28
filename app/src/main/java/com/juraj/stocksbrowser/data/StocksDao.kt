@@ -15,6 +15,9 @@ interface StocksDao {
     @Query("SELECT * FROM stocks WHERE symbol IN (:symbols)")
     fun getStocksBySymbols(symbols: List<String>): Flow<List<StockEntity>>
 
+    @Query("SELECT * FROM stocks WHERE symbol == :symbol")
+    fun getStockBySymbol(symbol: String): Flow<StockEntity?>
+
     @Query("SELECT * FROM stocks WHERE name LIKE :searchQuery OR symbol LIKE :searchQuery")
     fun findStocks(searchQuery: String): Flow<List<StockEntity>>
 }
