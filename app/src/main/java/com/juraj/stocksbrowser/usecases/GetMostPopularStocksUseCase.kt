@@ -1,6 +1,6 @@
 package com.juraj.stocksbrowser.usecases
 
-import com.juraj.stocksbrowser.data.room.StockEntity
+import com.juraj.stocksbrowser.model.room.StockEntity
 import com.juraj.stocksbrowser.repositories.StocksRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

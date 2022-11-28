@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.repositories
 
 import com.juraj.stocksbrowser.api.YahooApiService
-import com.juraj.stocksbrowser.data.network.ChartApiResult
+import com.juraj.stocksbrowser.model.network.ChartApiResult
 import javax.inject.Inject
 
 class ChartsRepository @Inject constructor(

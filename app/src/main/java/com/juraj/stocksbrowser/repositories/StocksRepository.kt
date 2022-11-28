@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.repositories
 
 import com.juraj.stocksbrowser.dao.StocksDao
-import com.juraj.stocksbrowser.data.room.StockEntity
+import com.juraj.stocksbrowser.model.room.StockEntity
 import com.juraj.stocksbrowser.utils.toSafeString
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
 package com.juraj.stocksbrowser.usecases
 
-import com.juraj.stocksbrowser.data.room.EtfEntity
+import com.juraj.stocksbrowser.model.room.EtfEntity
 import com.juraj.stocksbrowser.repositories.EtfRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

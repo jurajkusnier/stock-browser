@@ -10,13 +10,11 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.juraj.stocksbrowser.api.ApiService
 import com.juraj.stocksbrowser.api.NasdaqApiService
 import com.juraj.stocksbrowser.api.YahooApiService
 import com.juraj.stocksbrowser.dao.EtfDao
-import com.juraj.stocksbrowser.data.AppDatabase
-import com.juraj.stocksbrowser.dao.InstrumentsDao
 import com.juraj.stocksbrowser.dao.StocksDao
+import com.juraj.stocksbrowser.dao.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,9 +29,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.io.File
-import javax.inject.Qualifier
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -74,18 +70,6 @@ class AppModule {
     }
 
     @Provides
-    fun provideStockApiService(
-        json: Json,
-        @BaseUrl baseUrl: String
-    ): ApiService {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
-            .create(ApiService::class.java)
-    }
-
-    @Provides
     fun provideHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             setLevel(HttpLoggingInterceptor.Level.HEADERS)
@@ -108,10 +92,11 @@ class AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideRoomDatabase(@ApplicationContext applicationContext: Context): AppDatabase =
         Room.databaseBuilder(
             applicationContext,
-            AppDatabase::class.java, DATABSE_NAME
+            AppDatabase::class.java, DATABASE_NAME
         ).build()
 
     @Provides
@@ -128,10 +113,6 @@ class AppModule {
     }
 
     @Provides
-    fun provideInstrumentsDao(appDatabase: AppDatabase): InstrumentsDao =
-        appDatabase.instrumentsDao()
-
-    @Provides
     fun provideStocksDao(appDatabase: AppDatabase): StocksDao =
         appDatabase.stocksDao()
 
@@ -143,20 +124,10 @@ class AppModule {
     fun provideCacheDir(@ApplicationContext applicationContext: Context): File =
         applicationContext.cacheDir
 
-    @Provides
-    @BaseUrl
-    fun provideBaseUrl(): String = BASE_URL
-
     companion object {
-        private const val BASE_URL = "http://10.0.2.2:8080"
         private const val NASDAQ_BASE_URL = "https://api.nasdaq.com"
         private const val YAHOO_BASE_URL = "https://query1.finance.yahoo.com"
         private const val USER_PREFERENCES = "settings"
-        private const val DATABSE_NAME = "main-database"
+        private const val DATABASE_NAME = "main-database"
     }
 }
-
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class BaseUrl

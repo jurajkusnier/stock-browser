@@ -1,7 +1,10 @@
 package com.juraj.stocksbrowser.ui.home.screen
 
-import com.juraj.stocksbrowser.data.room.EtfEntity
-import com.juraj.stocksbrowser.data.room.StockEntity
+import com.juraj.stocksbrowser.model.room.EtfEntity
+import com.juraj.stocksbrowser.model.room.InstrumentEntity
+import com.juraj.stocksbrowser.model.room.StockEntity
+import com.juraj.stocksbrowser.utils.format
+import com.juraj.stocksbrowser.utils.toDeltaIndicator
 
 data class HomeScreenState(
     val isLoading: Boolean = true,
@@ -31,8 +34,8 @@ sealed class ListItem {
     data class InstrumentItem(
         val symbol: String,
         val name: String,
-        val lastSalePrice: String = "",
-        val percentageChange: String = "",
+        val lastSalePrice: String,
+        val percentageChange: String,
         val deltaIndicator: DeltaIndicator,
         val type: InstrumentType
     ) : ListItem()
@@ -48,20 +51,26 @@ enum class HeaderType {
     Favorites, MostPopularStocks, MostPopularEtfs
 }
 
-fun StockEntity.toInstrumentItem() = ListItem.InstrumentItem(
-    type = InstrumentType.Stock,
-    symbol = symbol,
-    name = name,
-    lastSalePrice = lastsale,
-    percentageChange = pctchange,
-    deltaIndicator = if (pctchange.startsWith("-")) DeltaIndicator.Down else DeltaIndicator.Up // TODO: change when data in DB are numeric
-)
-
-fun EtfEntity.toInstrumentItem() = ListItem.InstrumentItem(
-    type = InstrumentType.ETF,
+fun InstrumentEntity.toInstrumentItem() = ListItem.InstrumentItem(
+    type = getType(),
     symbol = symbol,
     name = companyName,
-    lastSalePrice = lastSalePrice,
-    percentageChange = percentageChange,
-    deltaIndicator = if (percentageChange.startsWith("-")) DeltaIndicator.Down else DeltaIndicator.Up // TODO: change when data in DB are numeric
+    lastSalePrice = "$" + lastSalePrice.format(2),
+    percentageChange = percentageChange.format(2) + "%",
+    deltaIndicator = percentageChange.toDeltaIndicator()
 )
+
+fun StockEntity.extractDetails(): List<Pair<String, String>> {
+    return mutableListOf<Pair<String, String>>().apply {
+        if (industry.isNotBlank()) add(Pair("Industry", industry))
+        if (sector.isNotBlank()) add(Pair("Sector", sector))
+        if (country.isNotBlank()) add(Pair("Country", country))
+        if (ipoYear != null) add(Pair("IPO Year", ipoYear.toString()))
+    }
+}
+
+fun EtfEntity.extractDetails(): List<Pair<String, String>> {
+    return mutableListOf<Pair<String, String>>().apply {
+        add(Pair("Name", companyName))
+    }
+}

@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.api
 
-import com.juraj.stocksbrowser.data.network.EtfApiResponse
-import com.juraj.stocksbrowser.data.network.StockApiResponse
+import com.juraj.stocksbrowser.model.network.EtfApiResponse
+import com.juraj.stocksbrowser.model.network.StockApiResponse
 import retrofit2.http.GET
 
 interface NasdaqApiService {

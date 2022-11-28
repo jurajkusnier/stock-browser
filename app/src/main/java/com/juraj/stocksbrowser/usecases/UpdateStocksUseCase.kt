@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.usecases
 
 import com.juraj.stocksbrowser.api.NasdaqApiService
-import com.juraj.stocksbrowser.data.room.toStockEntity
+import com.juraj.stocksbrowser.model.room.toStockEntity
 import com.juraj.stocksbrowser.repositories.StocksRepository
 import timber.log.Timber
 import javax.inject.Inject

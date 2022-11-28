@@ -1,4 +1,4 @@
-package com.juraj.stocksbrowser.data.network
+package com.juraj.stocksbrowser.model.network
 
 import kotlinx.serialization.Serializable
 

@@ -4,12 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.himanshoe.charty.candle.model.CandleEntry
-import com.juraj.stocksbrowser.data.room.extractDetails
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.repositories.ChartsRepository
 import com.juraj.stocksbrowser.repositories.EtfRepository
 import com.juraj.stocksbrowser.repositories.StocksRepository
 import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
+import com.juraj.stocksbrowser.ui.home.screen.extractDetails
 import com.juraj.stocksbrowser.ui.home.screen.toInstrumentItem
 import com.juraj.stocksbrowser.usecases.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,6 +75,7 @@ class DetailScreenViewModel @Inject constructor(
                     reduce {
                         state.copy(
                             instrument = instrumentEntity?.toInstrumentItem(),
+                            details = instrumentEntity?.extractDetails() ?: emptyList()
                         )
                     }
                 }
@@ -95,15 +96,20 @@ class DetailScreenViewModel @Inject constructor(
 
     private fun loadChart() {
         viewModelScope.launch {
-            val apiResponse = chartsRepository.getChart(
-                symbol = symbol,
-                range = selectedRangeInterval.range,
-                interval = selectedRangeInterval.interval
-            )
+            val apiResponse = try {
+                chartsRepository.getChart(
+                    symbol = symbol,
+                    range = selectedRangeInterval.range,
+                    interval = selectedRangeInterval.interval
+                )
+            } catch (e: Exception) {
+                null
+            }
+
             intent {
                 reduce {
                     val candleData =
-                        apiResponse.chart.result.firstOrNull()?.indicators?.quote?.firstOrNull()
+                        apiResponse?.chart?.result?.firstOrNull()?.indicators?.quote?.firstOrNull()
 
                     if (candleData != null) {
                         val lastIndex = min(candleData.high.lastIndex, candleData.low.lastIndex)

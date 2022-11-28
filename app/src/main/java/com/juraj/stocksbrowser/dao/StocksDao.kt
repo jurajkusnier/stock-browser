@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.juraj.stocksbrowser.data.room.StockEntity
+import com.juraj.stocksbrowser.model.room.StockEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,6 +19,6 @@ interface StocksDao {
     @Query("SELECT * FROM stocks WHERE symbol == :symbol")
     fun getStockBySymbol(symbol: String): Flow<StockEntity?>
 
-    @Query("SELECT * FROM stocks WHERE name LIKE :searchQuery OR symbol LIKE :searchQuery")
+    @Query("SELECT * FROM stocks WHERE companyName LIKE :searchQuery OR symbol LIKE :searchQuery")
     fun findStocks(searchQuery: String): Flow<List<StockEntity>>
 }

@@ -35,16 +35,6 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
-    fun getSymbolsUpdateDate() = dataStore.data.map { preferences ->
-        preferences[SYMBOLS_UPDATED_AT]?.toLocalDateOrNull()
-    }
-
-    suspend fun setSymbolsUpdateDate(localDate: LocalDate) {
-        dataStore.edit { preferences ->
-            preferences[SYMBOLS_UPDATED_AT] = localDate.toString()
-        }
-    }
-
     fun getFavoritesStocks() = dataStore.data.map { preferences ->
         preferences[FAV_STOCKS]?.toSet()
     }
@@ -76,7 +66,6 @@ class PreferencesRepository @Inject constructor(
     }
 
     companion object {
-        private val SYMBOLS_UPDATED_AT = stringPreferencesKey("symbols_updated_at")
         private val STOCKS_UPDATED_AT = stringPreferencesKey("stocks_updated_at")
         private val ETFS_UPDATED_AT = stringPreferencesKey("etfs_updated_at")
         private val FAV_STOCKS = stringSetPreferencesKey("fav_stocks")

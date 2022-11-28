@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
-import com.juraj.stocksbrowser.ui.home.SearchTextField
-import com.juraj.stocksbrowser.ui.home.SearchTextField2
-import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem3
+import com.juraj.stocksbrowser.ui.home.components.SearchTextFieldPlaceholder
+import com.juraj.stocksbrowser.ui.home.components.SearchTextField
+import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem
 import com.juraj.stocksbrowser.ui.home.components.StockListHeaderItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import org.orbitmvi.orbit.compose.collectAsState
@@ -64,7 +64,7 @@ private fun HomeScreen(
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    SearchTextField2(
+                    SearchTextField(
                         textFieldState,
                         focusRequester,
                         { textFieldValue ->
@@ -105,7 +105,7 @@ private fun HomeScreen(
                             )
                         }
 
-                        SearchTextField {
+                        SearchTextFieldPlaceholder {
                             action(HomeScreenIntent.SetSearchState(true))
                         }
                     }
@@ -158,7 +158,7 @@ private fun LazyListScope.addListItem(
     item {
         when (listItem) {
             is ListItem.HeaderItem -> StockListHeaderItem(listItem.readableType())
-            is ListItem.InstrumentItem -> InstrumentListItem3(listItem, onClick)
+            is ListItem.InstrumentItem -> InstrumentListItem(listItem, onClick)
             ListItem.ShimmerItem -> TODO()
         }
     }
