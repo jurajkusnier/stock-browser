@@ -12,9 +12,9 @@ import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.juraj.stocksbrowser.api.NasdaqApiService
 import com.juraj.stocksbrowser.api.YahooApiService
+import com.juraj.stocksbrowser.dao.AppDatabase
 import com.juraj.stocksbrowser.dao.EtfDao
 import com.juraj.stocksbrowser.dao.StocksDao
-import com.juraj.stocksbrowser.dao.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

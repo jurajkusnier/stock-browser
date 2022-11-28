@@ -19,9 +19,9 @@ class SearchStocksAndEtfsUseCase @Inject constructor(
             .findStocks(text).map { it.map { item -> item.toInstrumentItem() } }
             .combine(
                 etfRepository.findEtf(text)
-                    .map { it.map { item -> item.toInstrumentItem() } }) { stocks, etfs ->
+                    .map { it.map { item -> item.toInstrumentItem() } }
+            ) { stocks, etfs ->
                 stocks + etfs
             }
     }
-
 }

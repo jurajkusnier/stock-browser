@@ -39,7 +39,7 @@ class PreferencesRepository @Inject constructor(
         preferences[FAV_STOCKS]?.toSet()
     }
 
-    suspend fun toggleFavoritesStocks(symbol:String) {
+    suspend fun toggleFavoritesStocks(symbol: String) {
         dataStore.edit { preferences ->
             val currentSymbols = preferences[FAV_STOCKS] ?: emptySet()
             if (currentSymbols.contains(symbol)) {
@@ -54,7 +54,7 @@ class PreferencesRepository @Inject constructor(
         preferences[FAV_ETFS]?.toSet()
     }
 
-    suspend fun toggleFavoritesEtfs(symbol:String) {
+    suspend fun toggleFavoritesEtfs(symbol: String) {
         dataStore.edit { preferences ->
             val currentSymbols = preferences[FAV_ETFS] ?: emptySet()
             if (currentSymbols.contains(symbol)) {
@@ -71,5 +71,4 @@ class PreferencesRepository @Inject constructor(
         private val FAV_STOCKS = stringSetPreferencesKey("fav_stocks")
         private val FAV_ETFS = stringSetPreferencesKey("fav_etfs")
     }
-
 }

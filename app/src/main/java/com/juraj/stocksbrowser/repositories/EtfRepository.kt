@@ -20,5 +20,4 @@ class EtfRepository @Inject constructor(
 
     fun findEtf(searchQuery: String) =
         dao.findEtfs(searchQuery.toSafeString() + "%")
-
 }

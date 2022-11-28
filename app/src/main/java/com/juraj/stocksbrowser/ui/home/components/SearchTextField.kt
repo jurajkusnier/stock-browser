@@ -32,7 +32,8 @@ fun SearchTextField(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(top = 16.dp)
     ) {
-        TextField(value = textFieldState,
+        TextField(
+            value = textFieldState,
             maxLines = 1,
             singleLine = true,
             onValueChange = onValueChange,
@@ -41,12 +42,12 @@ fun SearchTextField(
                     Icon(Icons.Default.ArrowBack, null)
                 }
             }, trailingIcon = {
-                if (textFieldState.text.isNotEmpty()) {
-                    IconButton(onClick = { onValueChange(TextFieldValue()) }) {
-                        Icon(Icons.Default.Close, null)
-                    }
+            if (textFieldState.text.isNotEmpty()) {
+                IconButton(onClick = { onValueChange(TextFieldValue()) }) {
+                    Icon(Icons.Default.Close, null)
                 }
-            },
+            }
+        },
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -83,6 +84,7 @@ fun SearchTextField_PreviewWithVeryLongText() {
         SearchTextField(
             TextFieldValue("This is very very very long long long text text text 1234567890"),
             FocusRequester(),
-            {}) { }
+            {}
+        ) { }
     }
 }

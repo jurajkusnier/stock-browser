@@ -11,7 +11,11 @@ import com.juraj.stocksbrowser.repositories.StocksRepository
 import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.extractDetails
 import com.juraj.stocksbrowser.ui.home.screen.toInstrumentItem
-import com.juraj.stocksbrowser.usecases.*
+import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
+import com.juraj.stocksbrowser.usecases.IsFavoriteUseCase
+import com.juraj.stocksbrowser.usecases.RangeInterval
+import com.juraj.stocksbrowser.usecases.ToggleFavoriteUseCase
+import com.juraj.stocksbrowser.usecases.toSelectable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
@@ -86,9 +90,11 @@ class DetailScreenViewModel @Inject constructor(
         getRangeIntervalsUseCase().let {
             intent {
                 reduce {
-                    state.copy(rangeIntervals = it.map { rangeInterval ->
-                        rangeInterval.toSelectable(rangeInterval == selectedRangeInterval)
-                    })
+                    state.copy(
+                        rangeIntervals = it.map { rangeInterval ->
+                            rangeInterval.toSelectable(rangeInterval == selectedRangeInterval)
+                        }
+                    )
                 }
             }
         }
@@ -135,7 +141,8 @@ class DetailScreenViewModel @Inject constructor(
                                     high = high.toFloat(),
                                     low = low.toFloat()
                                 )
-                            })
+                            }
+                        )
                     } else {
                         state.copy(isLoading = false)
                     }
@@ -188,5 +195,4 @@ class DetailScreenViewModel @Inject constructor(
             }
         }
     }
-
 }

@@ -2,7 +2,16 @@ package com.juraj.stocksbrowser.ui.home.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juraj.stocksbrowser.usecases.*
+import com.juraj.stocksbrowser.usecases.AreEtfUpdatedUseCase
+import com.juraj.stocksbrowser.usecases.AreStocksUpdatedUseCase
+import com.juraj.stocksbrowser.usecases.GetFavoriteItemsUseCase
+import com.juraj.stocksbrowser.usecases.GetMostPopularEtfsUseCase
+import com.juraj.stocksbrowser.usecases.GetMostPopularStocksUseCase
+import com.juraj.stocksbrowser.usecases.SearchStocksAndEtfsUseCase
+import com.juraj.stocksbrowser.usecases.SetEtfsUpdatedUseCase
+import com.juraj.stocksbrowser.usecases.SetStocksUpdatedUseCase
+import com.juraj.stocksbrowser.usecases.UpdateEtfsUseCase
+import com.juraj.stocksbrowser.usecases.UpdateStocksUseCase
 import com.juraj.stocksbrowser.utils.toSafeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -214,5 +223,4 @@ class HomeScreenViewModel @Inject constructor(
             }
         }
     }
-
 }

@@ -1,6 +1,11 @@
 package com.juraj.stocksbrowser.ui.detail.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -77,14 +82,17 @@ fun TopAppBarDetails(
 @Composable
 fun TopAppBarDetails_Preview() {
     StocksBrowserTheme {
-        TopAppBarDetails(instrument = ListItem.InstrumentItem(
-            symbol = "IBM",
-            name = "International Business Machines Corp is very long name",
-            lastSalePrice = "$15.8",
-            percentageChange = "0.5%",
-            deltaIndicator = DeltaIndicator.Up,
-            type = InstrumentType.Stock
-        ), isElevated = false, isFavorite = false, {}, {})
+        TopAppBarDetails(
+            instrument = ListItem.InstrumentItem(
+                symbol = "IBM",
+                name = "International Business Machines Corp is very long name",
+                lastSalePrice = "$15.8",
+                percentageChange = "0.5%",
+                deltaIndicator = DeltaIndicator.Up,
+                type = InstrumentType.Stock
+            ),
+            isElevated = false, isFavorite = false, {}, {}
+        )
     }
 }
 
@@ -92,13 +100,16 @@ fun TopAppBarDetails_Preview() {
 @Composable
 fun TopAppBarDetails_Preview2() {
     StocksBrowserTheme {
-        TopAppBarDetails(instrument = ListItem.InstrumentItem(
-            symbol = "IBM",
-            name = "International Business Machines Corp is very long name",
-            lastSalePrice = "$15.8",
-            percentageChange = "0.5%",
-            deltaIndicator = DeltaIndicator.Up,
-            type = InstrumentType.Stock
-        ), isElevated = false, isFavorite = true, {}, {})
+        TopAppBarDetails(
+            instrument = ListItem.InstrumentItem(
+                symbol = "IBM",
+                name = "International Business Machines Corp is very long name",
+                lastSalePrice = "$15.8",
+                percentageChange = "0.5%",
+                deltaIndicator = DeltaIndicator.Up,
+                type = InstrumentType.Stock
+            ),
+            isElevated = false, isFavorite = true, {}, {}
+        )
     }
 }

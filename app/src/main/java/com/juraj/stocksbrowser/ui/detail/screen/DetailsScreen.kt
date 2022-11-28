@@ -1,7 +1,13 @@
 package com.juraj.stocksbrowser.ui.detail.screen
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
@@ -21,10 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.himanshoe.charty.candle.config.CandleStickConfig
 import com.himanshoe.charty.candle.model.CandleEntry
-import com.juraj.stocksbrowser.ui.detail.components.IntervalButtons
-import com.juraj.stocksbrowser.ui.detail.components.TopAppBarDetails
 import com.juraj.stocksbrowser.ui.detail.components.BetterCandleStickChart
 import com.juraj.stocksbrowser.ui.detail.components.DetailsTable
+import com.juraj.stocksbrowser.ui.detail.components.IntervalButtons
+import com.juraj.stocksbrowser.ui.detail.components.TopAppBarDetails
 import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
 import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.ListItem

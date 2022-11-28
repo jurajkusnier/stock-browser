@@ -1,7 +1,11 @@
 package com.juraj.stocksbrowser.ui.home.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,11 +30,13 @@ fun InstrumentListItem(
     onClick: (ListItem.InstrumentItem) -> Unit = {}
 ) {
 
-    Row(Modifier
-        .fillMaxWidth()
-        .clickable { onClick(instrumentItem) }
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick(instrumentItem) }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(Modifier.weight(1f)) {
             Text(
                 instrumentItem.symbol,

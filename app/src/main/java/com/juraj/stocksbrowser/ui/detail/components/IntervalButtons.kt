@@ -12,7 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
-import com.juraj.stocksbrowser.usecases.*
+import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
+import com.juraj.stocksbrowser.usecases.RangeInterval
+import com.juraj.stocksbrowser.usecases.SelectableRangeInterval
+import com.juraj.stocksbrowser.usecases.toRangeInterval
+import com.juraj.stocksbrowser.usecases.toSelectable
 
 @Composable
 fun IntervalButtons(

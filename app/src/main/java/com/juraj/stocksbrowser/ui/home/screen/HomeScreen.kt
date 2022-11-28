@@ -1,13 +1,33 @@
 package com.juraj.stocksbrowser.ui.home.screen
 
-import androidx.compose.animation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Divider
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -18,15 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
-import com.juraj.stocksbrowser.ui.home.components.SearchTextFieldPlaceholder
-import com.juraj.stocksbrowser.ui.home.components.SearchTextField
 import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem
+import com.juraj.stocksbrowser.ui.home.components.SearchTextField
+import com.juraj.stocksbrowser.ui.home.components.SearchTextFieldPlaceholder
 import com.juraj.stocksbrowser.ui.home.components.StockListHeaderItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
@@ -111,7 +129,6 @@ private fun HomeScreen(
                     }
                 }
             }
-
         }, scaffoldState = scaffoldState) { paddingValue ->
             Column(
                 Modifier

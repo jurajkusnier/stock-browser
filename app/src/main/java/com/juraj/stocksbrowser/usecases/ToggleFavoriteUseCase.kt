@@ -8,7 +8,7 @@ class ToggleFavoriteUseCase @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ) {
     suspend operator fun invoke(symbol: String, type: InstrumentType) {
-        when(type) {
+        when (type) {
             InstrumentType.Stock -> preferencesRepository.toggleFavoritesStocks(symbol)
             InstrumentType.ETF -> preferencesRepository.toggleFavoritesEtfs(symbol)
         }

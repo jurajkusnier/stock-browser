@@ -20,5 +20,4 @@ class StocksRepository @Inject constructor(
 
     fun findStocks(searchQuery: String) =
         dao.findStocks(searchQuery.toSafeString() + "%")
-
 }
