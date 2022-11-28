@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.ui.home.screen
 
-import androidx.lifecycle.*
-import com.juraj.stocksbrowser.data.StockEntity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.juraj.stocksbrowser.usecases.*
 import com.juraj.stocksbrowser.utils.toSafeString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,41 +10,72 @@ import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.viewmodel.container
-import javax.inject.Inject
 import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
+import javax.inject.Inject
+import kotlin.collections.List
+import kotlin.collections.emptyList
+import kotlin.collections.forEach
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.plus
+import kotlin.collections.set
+import kotlin.collections.toMutableMap
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-//    updateSymbolsUseCase: UpdateSymbolsUseCase,
     private val areStocksUpdatedUseCase: AreStocksUpdatedUseCase,
+    private val setStocksUpdatedUseCase: SetStocksUpdatedUseCase,
+    private val areEtfsUpdatedUseCase: AreEtfUpdatedUseCase,
+    private val setEtfsUpdatedUseCase: SetEtfsUpdatedUseCase,
     private val updateStocksUseCase: UpdateStocksUseCase,
+    private val updateEtfsUseCase: UpdateEtfsUseCase,
     private val getMostPopularStocksUseCase: GetMostPopularStocksUseCase,
-    getMostPopularEtfsUseCase: GetMostPopularEtfsUseCase,
+    private val getMostPopularEtfsUseCase: GetMostPopularEtfsUseCase,
     private val searchStocksAndEtfsUseCase: SearchStocksAndEtfsUseCase,
-    private val getFavoriteStocksUseCase: GetFavoriteStocksUseCase,
-//    private val areSymbolsUpdatedUseCase: AreSymbolsUpdatedUseCase
+    private val getFavoriteItemsUseCase: GetFavoriteItemsUseCase,
 ) : ContainerHost<HomeScreenState, HomeScreenSideEffect>, ViewModel() {
 
     private var searchJob: Job? = null
 
     override val container = container<HomeScreenState, HomeScreenSideEffect>(HomeScreenState())
 
-    private fun checkUpdate() {
+    private fun checkForUpdate() {
         viewModelScope.launch {
-            if (areStocksUpdatedUseCase().not()) {
-                Timber.d("Try to update stocks")
-                val success = updateStocksUseCase()
-                Timber.d("Stocks update finished, success = $success")
-            } else {
-                Timber.d("Stocks are already updated")
+            updateStocks()
+            updateEtfs()
+            loadingDone()
+        }
+    }
+
+    private suspend fun loadingDone() {
+        intent {
+            reduce {
+                state.copy(isLoading = false)
             }
-            intent {
-                reduce {
-                    state.copy(isLoading = false)
-                }
-            }
+        }
+    }
+
+    private suspend fun updateStocks() {
+        if (areStocksUpdatedUseCase().not()) {
+            Timber.d("Try to update stocks")
+            val success = updateStocksUseCase()
+            if (success) setStocksUpdatedUseCase()
+            Timber.d("Stocks update finished, success = $success")
+        } else {
+            Timber.d("Stocks are already updated")
+        }
+    }
+
+    private suspend fun updateEtfs() {
+        if (areEtfsUpdatedUseCase().not()) {
+            Timber.d("Try to update ETFs")
+            val success = updateEtfsUseCase()
+            if (success) setEtfsUpdatedUseCase()
+            Timber.d("ETFs update finished, success = $success")
+        } else {
+            Timber.d("ETFs are already updated")
         }
     }
 
@@ -67,13 +98,32 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun updateSearchResults(result: List<StockEntity>) {
+    private fun getMostPopularEtfs() {
+        viewModelScope.launch {
+            getMostPopularEtfsUseCase().collect { mostPopularEtfs ->
+                intent {
+                    reduce {
+                        val sections = state.sections.toMutableMap()
+                        sections[ScreenSection.Type.MostPopularEtfs] = ScreenSection(
+                            isVisible = state.isSearching.not(),
+                            data = listOf(ListItem.HeaderItem(HeaderType.MostPopularEtfs))
+                                .plus(mostPopularEtfs.map { it.toInstrumentItem() })
+                        )
+
+                        state.copy(sections = sections)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateSearchResults(result: List<ListItem.InstrumentItem>) {
         intent {
             reduce {
                 val sections = state.sections.toMutableMap()
                 sections[ScreenSection.Type.SearchResults] = ScreenSection(
                     isVisible = state.isSearching,
-                    data = result.map { it.toInstrumentItem() }
+                    data = result
                 )
 
                 state.copy(sections = sections)
@@ -82,13 +132,13 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
-        checkUpdate()
+        checkForUpdate()
 
         getMostPopularStocks()
 
-        getFavStocks()
+        getMostPopularEtfs()
 
-        // TODO: getMostPopularETFs()
+        getFavItems()
     }
 
     fun postIntent(intent: HomeScreenIntent) {
@@ -99,13 +149,13 @@ class HomeScreenViewModel @Inject constructor(
                 setSearchState(intent.value)
                 doSearch("")
             }
-            is HomeScreenIntent.OpenDetail -> navigateToDetail(intent.symbol)
+            is HomeScreenIntent.OpenDetail -> navigateToDetail(intent.item)
         }
     }
 
-    private fun navigateToDetail(symbol: String) {
+    private fun navigateToDetail(item: ListItem.InstrumentItem) {
         intent {
-            postSideEffect(HomeScreenSideEffect.NavigateToDetails(symbol))
+            postSideEffect(HomeScreenSideEffect.NavigateToDetails(item.symbol, item.type))
         }
     }
 
@@ -142,19 +192,19 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getFavStocks() {
+    private fun getFavItems() {
         viewModelScope.launch {
-            getFavoriteStocksUseCase().collect { favStocks ->
+            getFavoriteItemsUseCase().collect { favItems ->
                 intent {
                     reduce {
                         val sections = state.sections.toMutableMap()
-                        if (favStocks.isEmpty()) {
+                        if (favItems.isEmpty()) {
                             sections.remove(ScreenSection.Type.Favorites)
                         } else {
                             sections[ScreenSection.Type.Favorites] = ScreenSection(
                                 isVisible = state.isSearching.not(),
                                 data = listOf(ListItem.HeaderItem(HeaderType.Favorites))
-                                    .plus(favStocks.map { it.toInstrumentItem() })
+                                    .plus(favItems)
                             )
                         }
 

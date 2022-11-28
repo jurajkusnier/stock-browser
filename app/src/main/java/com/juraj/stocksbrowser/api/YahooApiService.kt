@@ -1,6 +1,6 @@
 package com.juraj.stocksbrowser.api
 
-import com.juraj.stocksbrowser.dao.ChartApiResult
+import com.juraj.stocksbrowser.data.network.ChartApiResult
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

@@ -26,6 +26,7 @@ import com.juraj.stocksbrowser.ui.detail.components.TopAppBarDetails
 import com.juraj.stocksbrowser.ui.detail.components.BetterCandleStickChart
 import com.juraj.stocksbrowser.ui.detail.components.DetailsTable
 import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
+import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.ListItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
@@ -150,7 +151,8 @@ fun DetailScreen_Preview() {
                     name = "International Business Machines Corp",
                     lastSalePrice = "$15.8",
                     percentageChange = "0.5%",
-                    deltaIndicator = DeltaIndicator.Up
+                    deltaIndicator = DeltaIndicator.Up,
+                    type = InstrumentType.Stock
                 ),
                 candleStickData = listOf(
                     CandleEntry(10f, 5f, 7f, 9f),

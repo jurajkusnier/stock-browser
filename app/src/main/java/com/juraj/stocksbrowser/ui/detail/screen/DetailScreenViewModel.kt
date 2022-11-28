@@ -4,10 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.himanshoe.charty.candle.model.CandleEntry
-import com.juraj.stocksbrowser.data.extractDetails
+import com.juraj.stocksbrowser.data.room.extractDetails
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.repositories.ChartsRepository
+import com.juraj.stocksbrowser.repositories.EtfRepository
 import com.juraj.stocksbrowser.repositories.StocksRepository
+import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.toInstrumentItem
 import com.juraj.stocksbrowser.usecases.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,11 +26,12 @@ import kotlin.math.roundToInt
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: StocksRepository,
+    private val stockRepository: StocksRepository,
+    private val etfRepository: EtfRepository,
     private val chartsRepository: ChartsRepository,
     private val getRangeIntervalsUseCase: GetRangeIntervalsUseCase,
-    private val isFavoriteStockUseCase: IsFavoriteStockUseCase,
-    private val toggleFavoriteStockUseCase: ToggleFavoriteStockUseCase
+    private val isFavoriteUseCase: IsFavoriteUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ContainerHost<DetailScreenState, DetailScreenSideEffect>, ViewModel() {
 
     override val container =
@@ -37,22 +40,45 @@ class DetailScreenViewModel @Inject constructor(
     private val symbol: String = NavDestinations.Details.getSymbol(savedStateHandle)
         ?: throw Exception("DetailScreenViewModel without symbol")
 
+    private val type: InstrumentType = NavDestinations.Details.getType(savedStateHandle)
+        ?: throw Exception("DetailScreenViewModel without type")
+
     private var selectedRangeInterval: RangeInterval = getRangeIntervalsUseCase().first()
 
     private fun loadInstrument() {
         viewModelScope.launch {
-            repository.getStock(symbol)
-                .collect { instrumentEntity ->
-                    intent {
-                        reduce {
-                            state.copy(
-                                instrument = instrumentEntity?.toInstrumentItem(),
-                                details = instrumentEntity?.extractDetails() ?: emptyList()
-                            )
-                        }
+            when (type) {
+                InstrumentType.Stock -> loadStockDetails()
+                InstrumentType.ETF -> loadEtfDetails()
+            }
+        }
+    }
+
+    private suspend fun loadStockDetails() {
+        stockRepository.getStock(symbol)
+            .collect { instrumentEntity ->
+                intent {
+                    reduce {
+                        state.copy(
+                            instrument = instrumentEntity?.toInstrumentItem(),
+                            details = instrumentEntity?.extractDetails() ?: emptyList()
+                        )
                     }
                 }
-        }
+            }
+    }
+
+    private suspend fun loadEtfDetails() {
+        etfRepository.getEtf(symbol)
+            .collect { instrumentEntity ->
+                intent {
+                    reduce {
+                        state.copy(
+                            instrument = instrumentEntity?.toInstrumentItem(),
+                        )
+                    }
+                }
+            }
     }
 
     private fun loadRangeIntervals() {
@@ -129,7 +155,7 @@ class DetailScreenViewModel @Inject constructor(
 
     private fun toggleFavorite() {
         viewModelScope.launch {
-            toggleFavoriteStockUseCase(symbol)
+            toggleFavoriteUseCase(symbol, type)
         }
     }
 
@@ -147,7 +173,7 @@ class DetailScreenViewModel @Inject constructor(
 
     private fun loadFavorite() {
         viewModelScope.launch {
-            isFavoriteStockUseCase(symbol).collect { value ->
+            isFavoriteUseCase(symbol, type).collect { value ->
                 intent {
                     reduce {
                         state.copy(isFavorite = value)

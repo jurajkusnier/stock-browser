@@ -1,7 +1,7 @@
 package com.juraj.stocksbrowser.repositories
 
 import com.juraj.stocksbrowser.data.InstrumentEntity
-import com.juraj.stocksbrowser.data.InstrumentsDao
+import com.juraj.stocksbrowser.dao.InstrumentsDao
 import com.juraj.stocksbrowser.utils.toSafeString
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

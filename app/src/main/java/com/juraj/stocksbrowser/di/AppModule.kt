@@ -13,9 +13,10 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.juraj.stocksbrowser.api.ApiService
 import com.juraj.stocksbrowser.api.NasdaqApiService
 import com.juraj.stocksbrowser.api.YahooApiService
+import com.juraj.stocksbrowser.dao.EtfDao
 import com.juraj.stocksbrowser.data.AppDatabase
-import com.juraj.stocksbrowser.data.InstrumentsDao
-import com.juraj.stocksbrowser.data.StocksDao
+import com.juraj.stocksbrowser.dao.InstrumentsDao
+import com.juraj.stocksbrowser.dao.StocksDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -133,6 +134,10 @@ class AppModule {
     @Provides
     fun provideStocksDao(appDatabase: AppDatabase): StocksDao =
         appDatabase.stocksDao()
+
+    @Provides
+    fun provideEtfDao(appDatabase: AppDatabase): EtfDao =
+        appDatabase.etfDao()
 
     @Provides
     fun provideCacheDir(@ApplicationContext applicationContext: Context): File =

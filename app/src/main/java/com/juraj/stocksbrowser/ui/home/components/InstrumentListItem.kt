@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
+import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.ListItem
 
 @Preview(showBackground = true, widthDp = 400)
@@ -96,21 +97,24 @@ private class FakeInstrumentItems : PreviewParameterProvider<ListItem> {
                 name = "International Business Machines Corp",
                 lastSalePrice = "$15.8",
                 percentageChange = "-0.5%",
-                deltaIndicator = DeltaIndicator.Down
+                deltaIndicator = DeltaIndicator.Down,
+                type = InstrumentType.Stock
             ),
             ListItem.InstrumentItem(
                 symbol = "IBM",
                 name = "International Business Machines Corp",
                 lastSalePrice = "$15.8",
                 percentageChange = "0.5%",
-                deltaIndicator = DeltaIndicator.Up
+                deltaIndicator = DeltaIndicator.Up,
+                type = InstrumentType.Stock
             ),
             ListItem.InstrumentItem(
                 symbol = "IBM",
                 name = "International Business Machines Corp",
                 lastSalePrice = "$15.8",
                 percentageChange = "0.0%",
-                deltaIndicator = DeltaIndicator.NoChange
+                deltaIndicator = DeltaIndicator.NoChange,
+                type = InstrumentType.Stock
             )
         )
 }

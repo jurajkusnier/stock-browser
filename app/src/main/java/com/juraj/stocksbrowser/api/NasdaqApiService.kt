@@ -1,6 +1,7 @@
 package com.juraj.stocksbrowser.api
 
-import com.juraj.stocksbrowser.dao.StockApiResponse
+import com.juraj.stocksbrowser.data.network.EtfApiResponse
+import com.juraj.stocksbrowser.data.network.StockApiResponse
 import retrofit2.http.GET
 
 interface NasdaqApiService {
@@ -9,5 +10,5 @@ interface NasdaqApiService {
     suspend fun getStocks(): StockApiResponse?
 
     @GET("api/screener/etf?download=true")
-    suspend fun getEtfs(): StockApiResponse? // TODO: new data model
+    suspend fun getEtfs(): EtfApiResponse?
 }

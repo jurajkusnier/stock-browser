@@ -1,18 +1,20 @@
-package com.juraj.stocksbrowser.dao
+package com.juraj.stocksbrowser.data.network
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ChartApiResult(val chart: ChartDto)
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class ChartDto(val result: List<ResultDto>)
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class ResultDto(val indicators: IndicatorsDto)
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class IndicatorsDto(val quote: List<QuoteDto>)
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class QuoteDto(
     val open: List<Double?>,
     val low: List<Double?>,

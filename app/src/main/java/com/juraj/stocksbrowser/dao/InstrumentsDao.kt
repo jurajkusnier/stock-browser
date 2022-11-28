@@ -1,9 +1,10 @@
-package com.juraj.stocksbrowser.data
+package com.juraj.stocksbrowser.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.juraj.stocksbrowser.data.InstrumentEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

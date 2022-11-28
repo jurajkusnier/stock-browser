@@ -1,4 +1,4 @@
-package com.juraj.stocksbrowser.dao
+package com.juraj.stocksbrowser.data.network
 
 import kotlinx.serialization.Serializable
 

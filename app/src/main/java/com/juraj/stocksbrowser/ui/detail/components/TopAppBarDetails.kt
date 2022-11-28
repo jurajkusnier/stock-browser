@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
 import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
+import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.ListItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 
@@ -81,7 +82,8 @@ fun TopAppBarDetails_Preview() {
             name = "International Business Machines Corp is very long name",
             lastSalePrice = "$15.8",
             percentageChange = "0.5%",
-            deltaIndicator = DeltaIndicator.Up
+            deltaIndicator = DeltaIndicator.Up,
+            type = InstrumentType.Stock
         ), isElevated = false, isFavorite = false, {}, {})
     }
 }
@@ -95,7 +97,8 @@ fun TopAppBarDetails_Preview2() {
             name = "International Business Machines Corp is very long name",
             lastSalePrice = "$15.8",
             percentageChange = "0.5%",
-            deltaIndicator = DeltaIndicator.Up
+            deltaIndicator = DeltaIndicator.Up,
+            type = InstrumentType.Stock
         ), isElevated = false, isFavorite = true, {}, {})
     }
 }

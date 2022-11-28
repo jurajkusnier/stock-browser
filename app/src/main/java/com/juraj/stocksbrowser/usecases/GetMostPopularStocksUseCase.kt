@@ -1,17 +1,17 @@
 package com.juraj.stocksbrowser.usecases
 
-import com.juraj.stocksbrowser.data.StockEntity
+import com.juraj.stocksbrowser.data.room.StockEntity
 import com.juraj.stocksbrowser.repositories.StocksRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetMostPopularStocksUseCase @Inject constructor(
-    private val stocksRepository: StocksRepository
+    private val repository: StocksRepository
 ) {
 
     operator fun invoke(): Flow<List<StockEntity>> {
-        return stocksRepository.getStocks(favoriteStocks)
+        return repository.getStocks(symbols)
     }
 
-    private val favoriteStocks = listOf("IBM", "MSFT", "TSLA", "AAPL", "GOOG")
+    private val symbols = listOf("IBM", "MSFT", "TSLA", "AAPL", "GOOG")
 }

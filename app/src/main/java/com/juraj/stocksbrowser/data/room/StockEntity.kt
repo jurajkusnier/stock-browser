@@ -1,8 +1,8 @@
-package com.juraj.stocksbrowser.data
+package com.juraj.stocksbrowser.data.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.juraj.stocksbrowser.dao.StockDto
+import com.juraj.stocksbrowser.data.network.StockDto
 import okhttp3.internal.toLongOrDefault
 
 @Entity(tableName = "stocks")

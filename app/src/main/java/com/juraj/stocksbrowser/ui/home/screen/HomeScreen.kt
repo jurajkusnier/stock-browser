@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -24,6 +25,8 @@ import com.juraj.stocksbrowser.ui.home.components.StockListHeaderItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
@@ -31,9 +34,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is HomeScreenSideEffect.NavigateToDetails -> navController.navigate(
-                NavDestinations.Details.uri(
-                    sideEffect.symbol
-                )
+                NavDestinations.Details.uri(sideEffect.symbol, sideEffect.type)
             )
         }
     }
@@ -46,7 +47,7 @@ private fun HomeScreen(
     state: HomeScreenState,
     action: (HomeScreenIntent) -> Unit,
 ) {
-    var textFieldState by remember { mutableStateOf(TextFieldValue()) }
+    var textFieldState by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
     val scaffoldState = rememberScaffoldState()
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
@@ -120,14 +121,17 @@ private fun HomeScreen(
             ) {
 
                 LazyColumn(state = lazyListState) {
-                    state.sections.flatMap { (_, value) ->
-                        if (value.isVisible) value.data else emptyList()
-                    }.windowed(size = 2, step = 1, true) { listItems ->
-                        addListItem(listItems.first()) { action(HomeScreenIntent.OpenDetail(it.symbol)) }
-                        if (listItems.size == 2 && listItems.first() is ListItem.InstrumentItem && listItems.last() is ListItem.InstrumentItem) {
-                            addDivider()
+                    state.sections
+                        .filter { (_, value) -> value.isVisible }
+                        .toList()
+                        .sortedBy { it.first.order }
+                        .flatMap { it.second.data }
+                        .windowed(size = 2, step = 1, true) { listItems ->
+                            addListItem(listItems.first()) { action(HomeScreenIntent.OpenDetail(it)) }
+                            if (listItems.size == 2 && listItems.first() is ListItem.InstrumentItem && listItems.last() is ListItem.InstrumentItem) {
+                                addDivider()
+                            }
                         }
-                    }
                 }
             }
         }
@@ -184,7 +188,8 @@ fun HomeScreen_Preview() {
                                 name = "International Business Machines Corp",
                                 lastSalePrice = "$14.5",
                                 percentageChange = "0.5%",
-                                deltaIndicator = DeltaIndicator.Up
+                                deltaIndicator = DeltaIndicator.Up,
+                                type = InstrumentType.Stock
                             )
                         ),
                         isVisible = true
