@@ -12,7 +12,8 @@ data class ScreenSection(val isVisible: Boolean, val data: List<ListItem>) {
     enum class Type {
         MostPopularStocks,
         MostPopularEtfs,
-        SearchResults
+        SearchResults,
+        Favorites,
     }
 }
 

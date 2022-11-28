@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Grade
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 fun TopAppBarDetails(
     instrument: ListItem.InstrumentItem?,
     isElevated: Boolean,
+    isFavorite: Boolean,
     onBackArrowClick: () -> Unit,
     onStarClick: () -> Unit
 ) {
@@ -64,7 +66,7 @@ fun TopAppBarDetails(
             }
 
             IconButton(onClick = onStarClick) {
-                Icon(Icons.Outlined.Grade, null) // TODO: use start for favorited item
+                Icon(if (isFavorite) Icons.Outlined.Star else Icons.Outlined.Grade, null)
             }
         }
     }
@@ -80,6 +82,20 @@ fun TopAppBarDetails_Preview() {
             lastSalePrice = "$15.8",
             percentageChange = "0.5%",
             deltaIndicator = DeltaIndicator.Up
-        ), false, {}, {})
+        ), isElevated = false, isFavorite = false, {}, {})
+    }
+}
+
+@Preview(showBackground = true, widthDp = 400)
+@Composable
+fun TopAppBarDetails_Preview2() {
+    StocksBrowserTheme {
+        TopAppBarDetails(instrument = ListItem.InstrumentItem(
+            symbol = "IBM",
+            name = "International Business Machines Corp is very long name",
+            lastSalePrice = "$15.8",
+            percentageChange = "0.5%",
+            deltaIndicator = DeltaIndicator.Up
+        ), isElevated = false, isFavorite = true, {}, {})
     }
 }

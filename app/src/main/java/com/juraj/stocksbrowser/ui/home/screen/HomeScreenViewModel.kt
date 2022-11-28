@@ -23,6 +23,7 @@ class HomeScreenViewModel @Inject constructor(
     private val getMostPopularStocksUseCase: GetMostPopularStocksUseCase,
     getMostPopularEtfsUseCase: GetMostPopularEtfsUseCase,
     private val searchStocksAndEtfsUseCase: SearchStocksAndEtfsUseCase,
+    private val getFavoriteStocksUseCase: GetFavoriteStocksUseCase,
 //    private val areSymbolsUpdatedUseCase: AreSymbolsUpdatedUseCase
 ) : ContainerHost<HomeScreenState, HomeScreenSideEffect>, ViewModel() {
 
@@ -85,6 +86,8 @@ class HomeScreenViewModel @Inject constructor(
 
         getMostPopularStocks()
 
+        getFavStocks()
+
         // TODO: getMostPopularETFs()
     }
 
@@ -135,6 +138,29 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 state.copy(isSearching = value, sections = sections)
+            }
+        }
+    }
+
+    private fun getFavStocks() {
+        viewModelScope.launch {
+            getFavoriteStocksUseCase().collect { favStocks ->
+                intent {
+                    reduce {
+                        val sections = state.sections.toMutableMap()
+                        if (favStocks.isEmpty()) {
+                            sections.remove(ScreenSection.Type.Favorites)
+                        } else {
+                            sections[ScreenSection.Type.Favorites] = ScreenSection(
+                                isVisible = state.isSearching.not(),
+                                data = listOf(ListItem.HeaderItem(HeaderType.Favorites))
+                                    .plus(favStocks.map { it.toInstrumentItem() })
+                            )
+                        }
+
+                        state.copy(sections = sections)
+                    }
+                }
             }
         }
     }

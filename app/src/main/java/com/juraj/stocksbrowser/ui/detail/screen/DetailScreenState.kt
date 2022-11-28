@@ -10,5 +10,6 @@ data class DetailScreenState(
     val candleStickData: List<CandleEntry> = emptyList(),
     val yAxis: List<String> = emptyList(),
     val rangeIntervals: List<SelectableRangeInterval> = emptyList(),
-    val details: List<Pair<String, String>> = emptyList()
+    val details: List<Pair<String, String>> = emptyList(),
+    val isFavorite: Boolean = false
 )

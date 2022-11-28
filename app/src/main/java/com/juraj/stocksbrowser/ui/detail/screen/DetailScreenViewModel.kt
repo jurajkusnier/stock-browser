@@ -9,9 +9,7 @@ import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.repositories.ChartsRepository
 import com.juraj.stocksbrowser.repositories.StocksRepository
 import com.juraj.stocksbrowser.ui.home.screen.toInstrumentItem
-import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
-import com.juraj.stocksbrowser.usecases.RangeInterval
-import com.juraj.stocksbrowser.usecases.toSelectable
+import com.juraj.stocksbrowser.usecases.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
@@ -28,7 +26,9 @@ class DetailScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: StocksRepository,
     private val chartsRepository: ChartsRepository,
-    private val getRangeIntervalsUseCase: GetRangeIntervalsUseCase
+    private val getRangeIntervalsUseCase: GetRangeIntervalsUseCase,
+    private val isFavoriteStockUseCase: IsFavoriteStockUseCase,
+    private val toggleFavoriteStockUseCase: ToggleFavoriteStockUseCase
 ) : ContainerHost<DetailScreenState, DetailScreenSideEffect>, ViewModel() {
 
     override val container =
@@ -116,13 +116,20 @@ class DetailScreenViewModel @Inject constructor(
         loadRangeIntervals()
         loadInstrument()
         loadChart()
+        loadFavorite()
     }
 
     fun postIntent(intent: DetailScreenIntent) {
         when (intent) {
             DetailScreenIntent.NavigateHome -> navigateHome()
-            DetailScreenIntent.ToggleFav -> TODO()
+            DetailScreenIntent.ToggleFav -> toggleFavorite()
             is DetailScreenIntent.SelectRangeInterval -> setRangeInterval(intent.rangeInterval)
+        }
+    }
+
+    private fun toggleFavorite() {
+        viewModelScope.launch {
+            toggleFavoriteStockUseCase(symbol)
         }
     }
 
@@ -136,6 +143,18 @@ class DetailScreenViewModel @Inject constructor(
         selectedRangeInterval = value
         loadRangeIntervals()
         loadChart()
+    }
+
+    private fun loadFavorite() {
+        viewModelScope.launch {
+            isFavoriteStockUseCase(symbol).collect { value ->
+                intent {
+                    reduce {
+                        state.copy(isFavorite = value)
+                    }
+                }
+            }
+        }
     }
 
 }

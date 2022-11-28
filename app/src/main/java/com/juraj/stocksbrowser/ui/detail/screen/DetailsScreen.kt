@@ -50,7 +50,7 @@ private fun DetailScreen(state: DetailScreenState, action: (DetailScreenIntent) 
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
     Scaffold(topBar = {
-        TopAppBarDetails(state.instrument, scrolledListState, {
+        TopAppBarDetails(state.instrument, scrolledListState, state.isFavorite, {
             action(DetailScreenIntent.NavigateHome)
         }, {
             action(DetailScreenIntent.ToggleFav)
