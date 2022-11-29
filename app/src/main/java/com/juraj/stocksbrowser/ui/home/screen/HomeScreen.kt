@@ -1,5 +1,6 @@
 package com.juraj.stocksbrowser.ui.home.screen
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -65,7 +66,11 @@ private fun HomeScreen(
     state: HomeScreenState,
     action: (HomeScreenIntent) -> Unit,
 ) {
-    var textFieldState by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
+    var textFieldState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(
+            TextFieldValue()
+        )
+    }
     val scaffoldState = rememberScaffoldState()
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
@@ -138,17 +143,12 @@ private fun HomeScreen(
             ) {
 
                 LazyColumn(state = lazyListState) {
-                    state.sections
-                        .filter { (_, value) -> value.isVisible }
-                        .toList()
-                        .sortedBy { it.first.order }
-                        .flatMap { it.second.data }
-                        .windowed(size = 2, step = 1, true) { listItems ->
-                            addListItem(listItems.first()) { action(HomeScreenIntent.OpenDetail(it)) }
-                            if (listItems.size == 2 && listItems.first() is ListItem.InstrumentItem && listItems.last() is ListItem.InstrumentItem) {
-                                addDivider()
-                            }
+                    state.sections.toListItem().map { (listItem, showDivider) ->
+                        addListItem(listItem) { action(HomeScreenIntent.OpenDetail(it)) }
+                        if (showDivider) {
+                            addDivider()
                         }
+                    }
                 }
             }
         }
@@ -189,7 +189,28 @@ private fun ListItem.HeaderItem.readableType(): String {
     }
 }
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+private fun Map<ScreenSection.Type, ScreenSection>.toListItem(): List<ListItemWithDivider> {
+    return this.filter { (_, value) -> value.isVisible }
+        .toList()
+        .sortedBy { it.first.order }
+        .flatMap { it.second.data }
+        .windowed(size = 2, step = 1, true) { listItems ->
+            ListItemWithDivider(
+                listItem = listItems.first(),
+                showDivider = listItems.size == 2 && listItems.first() is ListItem.InstrumentItem && listItems.last() is ListItem.InstrumentItem
+            )
+        }
+}
+
+private data class ListItemWithDivider(val listItem: ListItem, val showDivider: Boolean)
+
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_4,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
+@Preview(showBackground = true, device = Devices.PIXEL_4, name = "Light Mode")
 @Composable
 fun HomeScreen_Preview() {
     StocksBrowserTheme {

@@ -28,7 +28,7 @@ fun DetailsTable(data: List<Pair<String, String>>) {
             modifier = Modifier.padding(bottom = 8.dp)
         )
         data.forEachIndexed { index, pair ->
-            Row() {
+            Row {
                 Text(
                     pair.first,
                     style = MaterialTheme.typography.body1,
@@ -58,7 +58,7 @@ fun DetailScreen_Preview() {
         DetailsTable(
             listOf(
                 Pair("Industry", "Data mining"),
-                Pair("Sector", "Internet and Telecomunication"),
+                Pair("Sector", "Internet and Telecommunication"),
                 Pair("IPO Year", "2019")
             )
         )

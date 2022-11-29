@@ -1,69 +1,29 @@
 package com.juraj.stocksbrowser.repositories
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.juraj.stocksbrowser.utils.toLocalDateOrNull
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import javax.inject.Inject
 
 class PreferencesRepository @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val store: DataStoreWrapper
 ) {
 
-    suspend fun getEtfsUpdateDate(): LocalDate? = dataStore.data.map { preferences ->
-        preferences[ETFS_UPDATED_AT]?.toLocalDateOrNull()
-    }.firstOrNull()
+    suspend fun getEtfsUpdateDate(): LocalDate? = store.getLocalDate(ETFS_UPDATED_AT)
 
-    suspend fun setEtfsUpdateDate(value: LocalDate) {
-        dataStore.edit { preferences ->
-            preferences[ETFS_UPDATED_AT] = value.toString()
-        }
-    }
+    suspend fun getStocksUpdateDate(): LocalDate? = store.getLocalDate(STOCKS_UPDATED_AT)
 
-    suspend fun getStocksUpdateDate(): LocalDate? = dataStore.data.map { preferences ->
-        preferences[STOCKS_UPDATED_AT]?.toLocalDateOrNull()
-    }.firstOrNull()
+    suspend fun setEtfsUpdateDate(value: LocalDate) = store.setLocalDate(ETFS_UPDATED_AT, value)
 
-    suspend fun setStocksUpdateDate(value: LocalDate) {
-        dataStore.edit { preferences ->
-            preferences[STOCKS_UPDATED_AT] = value.toString()
-        }
-    }
+    suspend fun setStocksUpdateDate(value: LocalDate) = store.setLocalDate(STOCKS_UPDATED_AT, value)
 
-    fun getFavoritesStocks() = dataStore.data.map { preferences ->
-        preferences[FAV_STOCKS]?.toSet()
-    }
+    fun getFavoritesStocks() = store.getStringSet(FAV_STOCKS)
 
-    suspend fun toggleFavoritesStocks(symbol: String) {
-        dataStore.edit { preferences ->
-            val currentSymbols = preferences[FAV_STOCKS] ?: emptySet()
-            if (currentSymbols.contains(symbol)) {
-                preferences[FAV_STOCKS] = currentSymbols - setOf(symbol)
-            } else {
-                preferences[FAV_STOCKS] = currentSymbols + setOf(symbol)
-            }
-        }
-    }
+    fun getFavoritesEtfs() = store.getStringSet(FAV_ETFS)
 
-    fun getFavoritesEtfs() = dataStore.data.map { preferences ->
-        preferences[FAV_ETFS]?.toSet()
-    }
+    suspend fun toggleFavoritesStocks(symbol: String) = store.toggleStringSet(FAV_STOCKS, symbol)
 
-    suspend fun toggleFavoritesEtfs(symbol: String) {
-        dataStore.edit { preferences ->
-            val currentSymbols = preferences[FAV_ETFS] ?: emptySet()
-            if (currentSymbols.contains(symbol)) {
-                preferences[FAV_ETFS] = currentSymbols - setOf(symbol)
-            } else {
-                preferences[FAV_ETFS] = currentSymbols + setOf(symbol)
-            }
-        }
-    }
+    suspend fun toggleFavoritesEtfs(symbol: String) = store.toggleStringSet(FAV_ETFS, symbol)
 
     companion object {
         private val STOCKS_UPDATED_AT = stringPreferencesKey("stocks_updated_at")

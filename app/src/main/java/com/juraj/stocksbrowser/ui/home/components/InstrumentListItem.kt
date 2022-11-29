@@ -11,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.home.screen.DeltaIndicator
 import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 import com.juraj.stocksbrowser.ui.home.screen.ListItem
+import com.juraj.stocksbrowser.ui.home.screen.toColor
 
 @Preview(showBackground = true, widthDp = 400)
 @Composable
@@ -68,11 +68,7 @@ fun InstrumentListItem(
             style = MaterialTheme.typography.body2,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End,
-            color = when (instrumentItem.deltaIndicator) {
-                DeltaIndicator.Up -> Color(0xFF53AD8A) // TODO: separate
-                DeltaIndicator.Down -> Color(0xFFDE536D) // TODO: separate
-                DeltaIndicator.NoChange -> MaterialTheme.colors.onSurface
-            }
+            color = instrumentItem.deltaIndicator.toColor()
         )
     }
 }

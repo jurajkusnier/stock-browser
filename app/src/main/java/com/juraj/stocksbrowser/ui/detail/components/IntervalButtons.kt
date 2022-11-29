@@ -1,5 +1,6 @@
 package com.juraj.stocksbrowser.ui.detail.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +44,11 @@ fun IntervalButtons(
     }
 }
 
-@Preview(showBackground = true, widthDp = 400)
+@Preview(
+    showBackground = true, widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
+@Preview(showBackground = true, widthDp = 400, name = "Light Mode")
 @Composable
 fun IntervalButtons_Preview() {
     StocksBrowserTheme {

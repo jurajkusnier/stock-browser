@@ -1,8 +1,13 @@
 package com.juraj.stocksbrowser.ui.home.screen
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.juraj.stocksbrowser.model.room.EtfEntity
 import com.juraj.stocksbrowser.model.room.InstrumentEntity
 import com.juraj.stocksbrowser.model.room.StockEntity
+import com.juraj.stocksbrowser.ui.theme.darkGreen
+import com.juraj.stocksbrowser.ui.theme.darkRed
 import com.juraj.stocksbrowser.utils.format
 import com.juraj.stocksbrowser.utils.toDeltaIndicator
 
@@ -41,6 +46,15 @@ sealed class ListItem {
     ) : ListItem()
 
     data class HeaderItem(val type: HeaderType) : ListItem()
+}
+
+@Composable
+fun DeltaIndicator.toColor(): Color {
+    return when (this) {
+        DeltaIndicator.Up -> darkGreen
+        DeltaIndicator.Down -> darkRed
+        DeltaIndicator.NoChange -> MaterialTheme.colors.onSurface
+    }
 }
 
 enum class InstrumentType {

@@ -10,6 +10,9 @@ import com.himanshoe.charty.candle.model.CandleEntry
 import java.lang.Float.max
 import kotlin.math.min
 
+// Based on CandleStickChart but improving many bugs
+// TODO: use CandleStickChart from library when bugs are fixed
+
 @Composable
 fun BetterCandleStickChart(
     candleEntryData: List<CandleEntry>,

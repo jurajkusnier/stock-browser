@@ -1,5 +1,6 @@
 package com.juraj.stocksbrowser.ui.detail.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -78,7 +79,11 @@ fun TopAppBarDetails(
     }
 }
 
-@Preview(showBackground = true, widthDp = 400)
+@Preview(
+    showBackground = true, widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
+@Preview(showBackground = true, widthDp = 400, name = "Light Mode")
 @Composable
 fun TopAppBarDetails_Preview() {
     StocksBrowserTheme {
@@ -96,7 +101,11 @@ fun TopAppBarDetails_Preview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 400)
+@Preview(
+    showBackground = true, widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
+@Preview(showBackground = true, widthDp = 400, name = "Light Mode")
 @Composable
 fun TopAppBarDetails_Preview2() {
     StocksBrowserTheme {
