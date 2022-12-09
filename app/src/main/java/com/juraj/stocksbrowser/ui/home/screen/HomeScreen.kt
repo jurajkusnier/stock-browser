@@ -63,10 +63,11 @@ fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
             is HomeScreenSideEffect.NavigateToDetails -> navController.navigate(
                 NavDestinations.Details.uri(sideEffect.symbol, sideEffect.type)
             )
-            HomeScreenSideEffect.NetworkError -> coroutineScope
-                .showErrorSnackBar(scaffoldState.snackbarHostState) {
-                    viewModel.postIntent(HomeScreenIntent.Refresh)
-                }
+            HomeScreenSideEffect.NetworkError ->
+                coroutineScope
+                    .showErrorSnackBar(scaffoldState.snackbarHostState) {
+                        viewModel.postIntent(HomeScreenIntent.Refresh)
+                    }
         }
     }
 

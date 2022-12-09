@@ -29,7 +29,7 @@ fun Modifier.shimmerBackground(shape: RoundedCornerShape): Modifier = composed {
         ),
     )
     val shimmerColors = listOf(
-        MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.BackgroundOpacity ),
+        MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.BackgroundOpacity),
         MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.BackgroundOpacity * 0.5F),
     )
     val brush = Brush.linearGradient(

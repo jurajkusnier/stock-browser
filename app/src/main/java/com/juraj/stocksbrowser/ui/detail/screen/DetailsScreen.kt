@@ -44,10 +44,11 @@ fun DetailScreen(viewModel: DetailScreenViewModel, navController: NavController)
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is DetailScreenSideEffect.NavigateHome -> navController.popBackStack()
-            DetailScreenSideEffect.NetworkError -> coroutineScope
-                .showErrorSnackBar(scaffoldState.snackbarHostState) {
-                    viewModel.postIntent(DetailScreenIntent.Refresh)
-                }
+            DetailScreenSideEffect.NetworkError ->
+                coroutineScope
+                    .showErrorSnackBar(scaffoldState.snackbarHostState) {
+                        viewModel.postIntent(DetailScreenIntent.Refresh)
+                    }
         }
     }
 

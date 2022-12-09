@@ -5,6 +5,6 @@ import com.juraj.stocksbrowser.usecases.RangeInterval
 sealed class DetailScreenIntent {
     object NavigateHome : DetailScreenIntent()
     object ToggleFav : DetailScreenIntent()
-    object Refresh: DetailScreenIntent()
+    object Refresh : DetailScreenIntent()
     data class SelectRangeInterval(val rangeInterval: RangeInterval) : DetailScreenIntent()
 }
