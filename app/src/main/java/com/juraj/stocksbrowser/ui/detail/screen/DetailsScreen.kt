@@ -8,9 +8,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -22,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.himanshoe.charty.candle.model.CandleEntry
+import com.juraj.stocksbrowser.ui.common.showErrorSnackBar
 import com.juraj.stocksbrowser.ui.detail.components.CandleStickBox
 import com.juraj.stocksbrowser.ui.detail.components.DetailsTable
 import com.juraj.stocksbrowser.ui.detail.components.IntervalButtons
@@ -34,15 +32,14 @@ import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
 import com.juraj.stocksbrowser.usecases.toSelectable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun DetailScreen(viewModel: DetailScreenViewModel, navController: NavController) {
-    val viewState by viewModel.collectAsState()
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    val viewState by viewModel.collectAsState()
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -55,26 +52,6 @@ fun DetailScreen(viewModel: DetailScreenViewModel, navController: NavController)
     }
 
     DetailScreen(viewState, scaffoldState, viewModel::postIntent)
-}
-
-private fun CoroutineScope.showErrorSnackBar(
-    snackbarHostState: SnackbarHostState,
-    onClick: () -> Unit
-) {
-    launch {
-        snackbarHostState.currentSnackbarData?.dismiss()
-
-        val result = snackbarHostState.showSnackbar(
-            message = "Something went wrong",
-            actionLabel = "Try Again!",
-            duration = SnackbarDuration.Indefinite
-        )
-
-        when (result) {
-            SnackbarResult.Dismissed -> {}
-            SnackbarResult.ActionPerformed -> onClick()
-        }
-    }
 }
 
 @Composable

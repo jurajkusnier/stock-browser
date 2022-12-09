@@ -29,6 +29,8 @@ data class ScreenSection(val isVisible: Boolean, val data: List<ListItem>) {
 sealed class HomeScreenSideEffect {
     data class NavigateToDetails(val symbol: String, val type: InstrumentType) :
         HomeScreenSideEffect()
+
+    object NetworkError : HomeScreenSideEffect()
 }
 
 enum class DeltaIndicator { Up, Down, NoChange }
@@ -63,6 +65,14 @@ enum class InstrumentType {
 
 enum class HeaderType {
     Favorites, MostPopularStocks, MostPopularEtfs
+}
+
+fun List<InstrumentEntity>.toInstrumentItems(): List<ListItem> {
+    return if (isEmpty()) {
+        List(5) { ListItem.ShimmerItem }
+    } else {
+        map { it.toInstrumentItem() }
+    }
 }
 
 fun InstrumentEntity.toInstrumentItem() = ListItem.InstrumentItem(

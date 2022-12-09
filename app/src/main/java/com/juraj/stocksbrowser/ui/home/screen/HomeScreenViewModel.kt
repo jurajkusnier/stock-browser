@@ -15,6 +15,7 @@ import com.juraj.stocksbrowser.usecases.UpdateStocksUseCase
 import com.juraj.stocksbrowser.utils.toSafeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -23,14 +24,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.emptyList
-import kotlin.collections.forEach
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.plus
 import kotlin.collections.set
-import kotlin.collections.toMutableMap
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
@@ -47,44 +41,61 @@ class HomeScreenViewModel @Inject constructor(
 ) : ContainerHost<HomeScreenState, HomeScreenSideEffect>, ViewModel() {
 
     private var searchJob: Job? = null
+    private var checkForUpdateJob: Job? = null
 
     override val container = container<HomeScreenState, HomeScreenSideEffect>(HomeScreenState())
 
     private fun checkForUpdate() {
-        viewModelScope.launch {
-            updateStocks()
-            updateEtfs()
-            loadingDone()
-        }
-    }
-
-    private suspend fun loadingDone() {
-        intent {
-            reduce {
-                state.copy(isLoading = false)
+        checkForUpdateJob?.cancel()
+        checkForUpdateJob = viewModelScope.launch {
+            setLoadingState(true)
+            delay(2000)
+            val updateStocksSuccess = updateStocks()
+            val updateEtfsSuccess = updateEtfs()
+            setLoadingState(false)
+            if (updateStocksSuccess.not() or updateEtfsSuccess.not()) {
+                propagateError()
             }
         }
     }
 
-    private suspend fun updateStocks() {
-        if (areStocksUpdatedUseCase().not()) {
+    private suspend fun propagateError() {
+        intent {
+            postSideEffect(HomeScreenSideEffect.NetworkError)
+        }
+    }
+
+    private suspend fun setLoadingState(value: Boolean) {
+        intent {
+            reduce {
+                state.copy(isLoading = value)
+            }
+        }
+    }
+
+    private suspend fun updateStocks(): Boolean {
+        return if (areStocksUpdatedUseCase().not()) {
             Timber.d("Try to update stocks")
             val success = updateStocksUseCase()
             if (success) setStocksUpdatedUseCase()
             Timber.d("Stocks update finished, success = $success")
+            success
         } else {
             Timber.d("Stocks are already updated")
+            true
         }
     }
 
-    private suspend fun updateEtfs() {
-        if (areEtfsUpdatedUseCase().not()) {
+    private suspend fun updateEtfs(): Boolean {
+        return if (areEtfsUpdatedUseCase().not()) {
             Timber.d("Try to update ETFs")
             val success = updateEtfsUseCase()
             if (success) setEtfsUpdatedUseCase()
             Timber.d("ETFs update finished, success = $success")
+            success
         } else {
             Timber.d("ETFs are already updated")
+            true
         }
     }
 
@@ -97,7 +108,7 @@ class HomeScreenViewModel @Inject constructor(
                         sections[ScreenSection.Type.MostPopularStocks] = ScreenSection(
                             isVisible = state.isSearching.not(),
                             data = listOf(ListItem.HeaderItem(HeaderType.MostPopularStocks))
-                                .plus(mostPopularStocks.map { it.toInstrumentItem() })
+                                .plus(mostPopularStocks.toInstrumentItems())
                         )
 
                         state.copy(sections = sections)
@@ -116,7 +127,7 @@ class HomeScreenViewModel @Inject constructor(
                         sections[ScreenSection.Type.MostPopularEtfs] = ScreenSection(
                             isVisible = state.isSearching.not(),
                             data = listOf(ListItem.HeaderItem(HeaderType.MostPopularEtfs))
-                                .plus(mostPopularEtfs.map { it.toInstrumentItem() })
+                                .plus(mostPopularEtfs.toInstrumentItems())
                         )
 
                         state.copy(sections = sections)
@@ -159,6 +170,7 @@ class HomeScreenViewModel @Inject constructor(
                 doSearch("")
             }
             is HomeScreenIntent.OpenDetail -> navigateToDetail(intent.item)
+            HomeScreenIntent.Refresh -> checkForUpdate()
         }
     }
 

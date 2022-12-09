@@ -19,6 +19,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,31 +41,42 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
+import com.juraj.stocksbrowser.ui.common.showErrorSnackBar
 import com.juraj.stocksbrowser.ui.home.components.InstrumentListItem
 import com.juraj.stocksbrowser.ui.home.components.SearchTextField
 import com.juraj.stocksbrowser.ui.home.components.SearchTextFieldPlaceholder
+import com.juraj.stocksbrowser.ui.home.components.ShimmerListItem
 import com.juraj.stocksbrowser.ui.home.components.StockListHeaderItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
+import kotlinx.coroutines.CoroutineScope
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
     val viewState by viewModel.collectAsState()
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is HomeScreenSideEffect.NavigateToDetails -> navController.navigate(
                 NavDestinations.Details.uri(sideEffect.symbol, sideEffect.type)
             )
+            HomeScreenSideEffect.NetworkError -> coroutineScope
+                .showErrorSnackBar(scaffoldState.snackbarHostState) {
+                    viewModel.postIntent(HomeScreenIntent.Refresh)
+                }
         }
     }
 
-    HomeScreen(viewState, viewModel::postIntent)
+    HomeScreen(viewState, scaffoldState, viewModel::postIntent)
 }
 
 @Composable
 private fun HomeScreen(
     state: HomeScreenState,
+    scaffoldState: ScaffoldState,
     action: (HomeScreenIntent) -> Unit,
 ) {
     var textFieldState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -71,7 +84,6 @@ private fun HomeScreen(
             TextFieldValue()
         )
     }
-    val scaffoldState = rememberScaffoldState()
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
     val focusRequester = remember { FocusRequester() }
@@ -176,7 +188,7 @@ private fun LazyListScope.addListItem(
         when (listItem) {
             is ListItem.HeaderItem -> StockListHeaderItem(listItem.readableType())
             is ListItem.InstrumentItem -> InstrumentListItem(listItem, onClick)
-            ListItem.ShimmerItem -> TODO()
+            ListItem.ShimmerItem -> ShimmerListItem()
         }
     }
 }
@@ -234,6 +246,7 @@ fun HomeScreen_Preview() {
                     ),
                 )
             ),
+            rememberScaffoldState()
         ) {}
     }
 }
