@@ -17,6 +17,7 @@ import com.juraj.stocksbrowser.usecases.RangeInterval
 import com.juraj.stocksbrowser.usecases.ToggleFavoriteUseCase
 import com.juraj.stocksbrowser.usecases.toSelectable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -47,7 +48,8 @@ class DetailScreenViewModel @Inject constructor(
     private val type: InstrumentType = NavDestinations.Details.getType(savedStateHandle)
         ?: throw Exception("DetailScreenViewModel without type")
 
-    private var selectedRangeInterval: RangeInterval = getRangeIntervalsUseCase().first()
+    private var selectedRangeInterval: RangeInterval = getRangeIntervalsUseCase()[1]
+    private var loadChartJob: Job? = null
 
     private fun loadInstrument() {
         viewModelScope.launch {
@@ -101,7 +103,16 @@ class DetailScreenViewModel @Inject constructor(
     }
 
     private fun loadChart() {
-        viewModelScope.launch {
+        loadChartJob?.cancel()
+
+        loadChartJob = viewModelScope.launch {
+
+            intent {
+                reduce {
+                    state.copy(isLoading = true)
+                }
+            }
+
             val apiResponse = try {
                 chartsRepository.getChart(
                     symbol = symbol,
@@ -109,6 +120,9 @@ class DetailScreenViewModel @Inject constructor(
                     interval = selectedRangeInterval.interval
                 )
             } catch (e: Exception) {
+                intent {
+                    postSideEffect(DetailScreenSideEffect.NetworkError)
+                }
                 null
             }
 
@@ -162,6 +176,7 @@ class DetailScreenViewModel @Inject constructor(
         when (intent) {
             DetailScreenIntent.NavigateHome -> navigateHome()
             DetailScreenIntent.ToggleFav -> toggleFavorite()
+            DetailScreenIntent.Refresh -> loadChart()
             is DetailScreenIntent.SelectRangeInterval -> setRangeInterval(intent.rangeInterval)
         }
     }

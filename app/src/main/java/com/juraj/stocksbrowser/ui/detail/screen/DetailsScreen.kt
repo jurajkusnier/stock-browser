@@ -1,13 +1,23 @@
 package com.juraj.stocksbrowser.ui.detail.screen
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -23,56 +33,100 @@ import com.juraj.stocksbrowser.ui.home.screen.ListItem
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 import com.juraj.stocksbrowser.usecases.GetRangeIntervalsUseCase
 import com.juraj.stocksbrowser.usecases.toSelectable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun DetailScreen(viewModel: DetailScreenViewModel, navController: NavController) {
     val viewState by viewModel.collectAsState()
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is DetailScreenSideEffect.NavigateHome -> navController.popBackStack()
+            DetailScreenSideEffect.NetworkError -> coroutineScope
+                .showErrorSnackBar(scaffoldState.snackbarHostState) {
+                    viewModel.postIntent(DetailScreenIntent.Refresh)
+                }
         }
     }
 
-    DetailScreen(viewState, viewModel::postIntent)
+    DetailScreen(viewState, scaffoldState, viewModel::postIntent)
+}
+
+private fun CoroutineScope.showErrorSnackBar(
+    snackbarHostState: SnackbarHostState,
+    onClick: () -> Unit
+) {
+    launch {
+        snackbarHostState.currentSnackbarData?.dismiss()
+
+        val result = snackbarHostState.showSnackbar(
+            message = "Something went wrong",
+            actionLabel = "Try Again!",
+            duration = SnackbarDuration.Indefinite
+        )
+
+        when (result) {
+            SnackbarResult.Dismissed -> {}
+            SnackbarResult.ActionPerformed -> onClick()
+        }
+    }
 }
 
 @Composable
-private fun DetailScreen(state: DetailScreenState, action: (DetailScreenIntent) -> Unit) {
+private fun DetailScreen(
+    state: DetailScreenState,
+    scaffoldState: ScaffoldState,
+    action: (DetailScreenIntent) -> Unit
+) {
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
-    Scaffold(topBar = {
-        TopAppBarDetails(state.instrument, scrolledListState, state.isFavorite, {
-            action(DetailScreenIntent.NavigateHome)
-        }, {
-            action(DetailScreenIntent.ToggleFav)
-        })
-    }) { paddingValues ->
-        LazyColumn(state = lazyListState, contentPadding = paddingValues) {
+    Scaffold(
+        topBar = {
+            TopAppBarDetails(state.instrument, scrolledListState, state.isFavorite, {
+                action(DetailScreenIntent.NavigateHome)
+            }, {
+                action(DetailScreenIntent.ToggleFav)
+            })
+        },
+        scaffoldState = scaffoldState
+    ) { paddingValues ->
+        Box(
+            Modifier
+                .fillMaxWidth()
+        ) {
+            LazyColumn(state = lazyListState, contentPadding = paddingValues) {
 
-            state.instrument?.let { instrument ->
+                state.instrument?.let { instrument ->
+                    item {
+                        PriceAndChange(
+                            percentageChange = instrument.percentageChange,
+                            lastSalePrice = instrument.lastSalePrice,
+                            deltaIndicator = instrument.deltaIndicator
+                        )
+                    }
+                }
+
                 item {
-                    PriceAndChange(
-                        percentageChange = instrument.percentageChange,
-                        lastSalePrice = instrument.lastSalePrice,
-                        deltaIndicator = instrument.deltaIndicator
-                    )
+                    CandleStickBox(candleStickData = state.candleStickData, yAxis = state.yAxis)
+                }
+
+                item {
+                    IntervalButtons(state.rangeIntervals) {
+                        action(DetailScreenIntent.SelectRangeInterval(it))
+                    }
+                }
+
+                item {
+                    DetailsTable(state.details)
                 }
             }
-
-            item {
-                CandleStickBox(candleStickData = state.candleStickData, yAxis = state.yAxis)
-            }
-
-            item {
-                IntervalButtons(state.rangeIntervals) {
-                    action(DetailScreenIntent.SelectRangeInterval(it))
-                }
-            }
-
-            item {
-                DetailsTable(state.details)
+            if (state.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
         }
     }
@@ -111,7 +165,8 @@ fun DetailScreen_Preview() {
                     Pair("Sector", "Internet and Telecommunication"),
                     Pair("IPO Year", "2019")
                 )
-            )
+            ),
+            rememberScaffoldState()
         ) {}
     }
 }
