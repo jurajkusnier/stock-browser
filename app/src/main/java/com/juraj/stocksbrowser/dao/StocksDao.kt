@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface StocksDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(stockEntity: StockEntity)
+    suspend fun insertAll(stockEntity: List<StockEntity>)
 
     @Query("SELECT * FROM stocks WHERE symbol IN (:symbols)")
     fun getStocksBySymbols(symbols: List<String>): Flow<List<StockEntity>>

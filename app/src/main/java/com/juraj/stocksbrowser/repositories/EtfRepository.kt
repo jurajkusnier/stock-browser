@@ -9,8 +9,8 @@ class EtfRepository @Inject constructor(
     private val dao: EtfDao
 ) {
 
-    suspend fun insertEtf(entity: EtfEntity) =
-        dao.insert(entity)
+    suspend fun insertEtfs(entities: List<EtfEntity>) =
+        dao.insertAll(entities)
 
     fun getEtfs(symbols: List<String>) =
         dao.getEtfsBySymbols(symbols)

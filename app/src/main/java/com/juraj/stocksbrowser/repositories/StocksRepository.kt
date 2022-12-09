@@ -9,8 +9,7 @@ class StocksRepository @Inject constructor(
     private val dao: StocksDao
 ) {
 
-    suspend fun insertStock(stockEntity: StockEntity) =
-        dao.insert(stockEntity)
+    suspend fun insertStocks(entities: List<StockEntity>) = dao.insertAll(entities)
 
     fun getStocks(symbols: List<String>) =
         dao.getStocksBySymbols(symbols)

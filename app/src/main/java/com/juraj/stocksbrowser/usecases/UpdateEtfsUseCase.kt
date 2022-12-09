@@ -14,9 +14,7 @@ class UpdateEtfsUseCase @Inject constructor(
     suspend operator fun invoke(): Boolean {
         try {
             val apiResponse = nasdaqApiService.getEtfs() ?: return false
-            apiResponse.data.data.rows.forEach { etf ->
-                repository.insertEtf(etf.toEtfEntity())
-            }
+            repository.insertEtfs(apiResponse.data.data.rows.map { it.toEtfEntity() })
         } catch (e: Exception) {
             Timber.e(e)
             return false

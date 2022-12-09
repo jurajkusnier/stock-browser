@@ -14,9 +14,7 @@ class UpdateStocksUseCase @Inject constructor(
     suspend operator fun invoke(): Boolean {
         try {
             val apiResponse = nasdaqApiService.getStocks() ?: return false
-            apiResponse.data.rows.forEach { stockDto ->
-                repository.insertStock(stockDto.toStockEntity())
-            }
+            repository.insertStocks(apiResponse.data.rows.map { it.toStockEntity() })
         } catch (e: Exception) {
             Timber.e(e)
             return false

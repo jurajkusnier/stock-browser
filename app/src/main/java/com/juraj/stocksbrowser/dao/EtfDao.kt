@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface EtfDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: EtfEntity)
+    suspend fun insertAll(entity: List<EtfEntity>)
 
     @Query("SELECT * FROM etfs WHERE symbol IN (:symbols)")
     fun getEtfsBySymbols(symbols: List<String>): Flow<List<EtfEntity>>
