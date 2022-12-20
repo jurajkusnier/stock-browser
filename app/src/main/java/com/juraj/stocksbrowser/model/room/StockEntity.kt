@@ -25,8 +25,8 @@ data class StockEntity(
 fun StockDto.toStockEntity() = StockEntity(
     symbol = symbol,
     companyName = name.replace("Common Stock", "").trim(),
-    lastSalePrice = lastsale.toNumericString().toDouble(),
-    percentageChange = pctchange.toNumericString().toDouble(),
+    lastSalePrice = lastsale.toNumericString().toDoubleOrNull() ?: 0.0,
+    percentageChange = pctchange.toNumericString().toDoubleOrNull() ?: 0.0,
     volume = volume.toLongOrNull(),
     marketCap = marketCap.toLongOrNull(),
     country = country,

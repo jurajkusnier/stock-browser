@@ -13,6 +13,6 @@ class IsFavoriteUseCase @Inject constructor(
         return when (type) {
             InstrumentType.Stock -> preferencesRepository.getFavoritesStocks()
             InstrumentType.ETF -> preferencesRepository.getFavoritesEtfs()
-        }.map { it?.contains(symbol) == true }
+        }.map { it.contains(symbol) }
     }
 }
