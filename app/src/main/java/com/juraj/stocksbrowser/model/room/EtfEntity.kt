@@ -23,6 +23,6 @@ data class EtfEntity(
 fun EtfDto.toEtfEntity() = EtfEntity(
     symbol = symbol,
     companyName = companyName,
-    lastSalePrice = lastSalePrice.toNumericString().toDouble(),
-    percentageChange = percentageChange.toNumericString().toDouble()
+    lastSalePrice = lastSalePrice.toNumericString().toDoubleOrNull() ?: 0.0,
+    percentageChange = percentageChange.toNumericString().toDoubleOrNull() ?: 0.0
 )
