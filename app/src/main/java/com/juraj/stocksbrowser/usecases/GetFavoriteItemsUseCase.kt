@@ -24,7 +24,7 @@ class GetFavoriteItemsUseCase @Inject constructor(
                 stocksRepository.getStocks(it.first.toList())
                     .combine(etfRepository.getEtfs(it.second.toList())) { stocks, etfs ->
                         stocks.map { stock -> stock.toInstrumentItem() } +
-                                etfs.map { etf -> etf.toInstrumentItem() }
+                            etfs.map { etf -> etf.toInstrumentItem() }
                     }
             }
     }
