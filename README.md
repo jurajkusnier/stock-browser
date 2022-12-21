@@ -29,7 +29,10 @@ App uses **MVI (Model View Intent)** architecture pattern, implemented using Orb
 - [**kotlinx.serialization**](https://github.com/Kotlin/kotlinx.serialization) - Kotlin multiplatform / multi-format reflectionless serialization
 - [**Hilt**](https://dagger.dev/hilt/) - Provides a standard way to incorporate Dagger dependency injection into an Android application.
 - [**Orbit-MVI**](https://orbit-mvi.org/) - Redux/MVI-like library - but without the baggage
+- [**mockito**](https://site.mockito.org/) - Tasty mocking framework for unit tests in Java
 
+## CI/CD
+- [**GitHub Actions**](https://docs.github.com/en/actions) - CI/CD platform that allows you to automate your build, test, and deployment pipeline.
 
 ## Screenshots
 
