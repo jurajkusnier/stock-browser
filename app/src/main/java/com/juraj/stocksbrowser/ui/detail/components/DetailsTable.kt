@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.juraj.stocksbrowser.ui.theme.StocksBrowserTheme
 
 @Composable
-fun DetailsTable(data: List<Pair<String, String>>) {
+fun DetailsTable(data: Map<String, String>) {
     Column(
         Modifier
             .padding(horizontal = 16.dp)
@@ -27,21 +27,25 @@ fun DetailsTable(data: List<Pair<String, String>>) {
             style = MaterialTheme.typography.h2,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        data.forEachIndexed { index, pair ->
+        data.onEachIndexed { index, (key, value) ->
             Row {
                 Text(
-                    pair.first,
+                    key,
                     style = MaterialTheme.typography.body1,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f).padding(vertical = 2.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 2.dp)
                 )
                 Text(
-                    pair.second,
+                    value,
                     style = MaterialTheme.typography.body1,
-                    modifier = Modifier.weight(2f).padding(vertical = 2.dp)
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(vertical = 2.dp)
                 )
             }
-            if (index != data.lastIndex) {
+            if (index < data.size - 1) {
                 Divider(
                     color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
                     thickness = 1.dp
@@ -56,10 +60,10 @@ fun DetailsTable(data: List<Pair<String, String>>) {
 fun DetailScreen_Preview() {
     StocksBrowserTheme {
         DetailsTable(
-            listOf(
-                Pair("Industry", "Data mining"),
-                Pair("Sector", "Internet and Telecommunication"),
-                Pair("IPO Year", "2019")
+            mapOf(
+                "Industry" to "Data mining",
+                "Sector" to "Internet and Telecommunication",
+                "IPO Year" to "2019"
             )
         )
     }

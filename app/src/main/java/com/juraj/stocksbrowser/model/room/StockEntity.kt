@@ -20,6 +20,12 @@ data class StockEntity(
     val sector: String
 ) : InstrumentEntity {
     override fun getType() = InstrumentType.Stock
+    override fun getDetails(): Map<String, String> = mutableMapOf<String, String>().apply {
+        if (industry.isNotBlank()) set("Industry", industry)
+        if (sector.isNotBlank()) set("Sector", sector)
+        if (country.isNotBlank()) set("Country", country)
+        if (ipoYear != null) set("IPO Year", ipoYear.toString())
+    }
 }
 
 fun StockDto.toStockEntity() = StockEntity(

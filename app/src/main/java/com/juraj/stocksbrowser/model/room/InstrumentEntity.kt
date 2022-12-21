@@ -8,4 +8,5 @@ interface InstrumentEntity {
     val lastSalePrice: Double
     val percentageChange: Double
     fun getType(): InstrumentType
+    fun getDetails(): Map<String, String>
 }

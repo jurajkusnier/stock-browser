@@ -1,7 +1,6 @@
 package com.juraj.stocksbrowser.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,10 +13,10 @@ import com.juraj.stocksbrowser.ui.home.screen.InstrumentType
 fun AppNavHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = NavDestinations.Home.url) {
         composable(route = NavDestinations.Home.url) {
-            HomeScreen(hiltViewModel(), navController)
+            HomeScreen(navController)
         }
         composable(route = NavDestinations.Details.url) {
-            DetailScreen(hiltViewModel(), navController)
+            DetailScreen(navController)
         }
     }
 }
