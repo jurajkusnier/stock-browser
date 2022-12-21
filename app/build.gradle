@@ -67,7 +67,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation "androidx.compose.runtime:runtime-livedata:1.3.1"
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.2"
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
@@ -85,6 +85,10 @@ dependencies {
     implementation "com.himanshoe:charty:1.0.1"
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'io.kotest:kotest-runner-junit5:5.5.4'
+    testImplementation "org.mockito:mockito-core:4.5.1"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
+    testImplementation "io.mockk:mockk:1.13.3"
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
