@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.juraj.stocksbrowser.navigation.NavDestinations
 import com.juraj.stocksbrowser.ui.common.SimpleTopAppBar
@@ -53,7 +54,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
     val viewState by viewModel.collectAsState()
@@ -66,19 +67,19 @@ fun HomeScreen(viewModel: HomeScreenViewModel, navController: NavController) {
             HomeScreenSideEffect.NetworkError ->
                 coroutineScope
                     .showErrorSnackBar(scaffoldState.snackbarHostState) {
-                        viewModel.postIntent(HomeScreenIntent.Refresh)
+                        viewModel.handleIntent(HomeIntent.Refresh)
                     }
         }
     }
 
-    HomeScreen(viewState, scaffoldState, viewModel::postIntent)
+    HomeScreen(viewState, scaffoldState, viewModel::handleIntent)
 }
 
 @Composable
 private fun HomeScreen(
-    state: HomeScreenState,
+    state: HomeState,
     scaffoldState: ScaffoldState,
-    action: (HomeScreenIntent) -> Unit,
+    action: (HomeIntent) -> Unit,
 ) {
     var textFieldState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
@@ -108,12 +109,12 @@ private fun HomeScreen(
                                 .copy(text = textFieldValue.text.replace('\n', ' '))
                                 .let {
                                     textFieldState = it
-                                    action(HomeScreenIntent.Search(it.text))
+                                    action(HomeIntent.Search(it.text))
                                 }
                         }
                     ) {
                         textFieldState = TextFieldValue()
-                        action(HomeScreenIntent.SetSearchState(false))
+                        action(HomeIntent.SetSearchState(false))
                     }
 
                     LaunchedEffect(state.isSearching) {
@@ -142,7 +143,7 @@ private fun HomeScreen(
                         }
 
                         SearchTextFieldPlaceholder {
-                            action(HomeScreenIntent.SetSearchState(true))
+                            action(HomeIntent.SetSearchState(true))
                         }
                     }
                 }
@@ -157,7 +158,7 @@ private fun HomeScreen(
 
                 LazyColumn(state = lazyListState) {
                     state.sections.toListItem().map { (listItem, showDivider) ->
-                        addListItem(listItem) { action(HomeScreenIntent.OpenDetail(it)) }
+                        addListItem(listItem) { action(HomeIntent.OpenDetail(it)) }
                         if (showDivider) {
                             addDivider()
                         }
@@ -228,7 +229,7 @@ private data class ListItemWithDivider(val listItem: ListItem, val showDivider: 
 fun HomeScreen_Preview() {
     StocksBrowserTheme {
         HomeScreen(
-            HomeScreenState(
+            HomeState(
                 isSearching = false,
                 sections = mapOf(
                     ScreenSection.Type.MostPopularStocks to ScreenSection(

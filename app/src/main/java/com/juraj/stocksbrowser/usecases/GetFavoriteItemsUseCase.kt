@@ -21,13 +21,10 @@ class GetFavoriteItemsUseCase @Inject constructor(
             .combine(preferencesRepository.getFavoritesEtfs()) { stocks, etf ->
                 Pair(stocks, etf)
             }.flatMapMerge {
-                stocksRepository.getStocks(it.first?.toList() ?: emptyList())
-                    .combine(
-                        etfRepository.getEtfs(
-                            it.second?.toList() ?: emptyList()
-                        )
-                    ) { stocks, etfs ->
-                        stocks.map { stock -> stock.toInstrumentItem() } + etfs.map { etf -> etf.toInstrumentItem() }
+                stocksRepository.getStocks(it.first.toList())
+                    .combine(etfRepository.getEtfs(it.second.toList())) { stocks, etfs ->
+                        stocks.map { stock -> stock.toInstrumentItem() } +
+                            etfs.map { etf -> etf.toInstrumentItem() }
                     }
             }
     }

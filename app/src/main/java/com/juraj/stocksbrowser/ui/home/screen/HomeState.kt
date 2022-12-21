@@ -3,19 +3,53 @@ package com.juraj.stocksbrowser.ui.home.screen
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.juraj.stocksbrowser.model.room.EtfEntity
 import com.juraj.stocksbrowser.model.room.InstrumentEntity
-import com.juraj.stocksbrowser.model.room.StockEntity
 import com.juraj.stocksbrowser.ui.theme.darkGreen
 import com.juraj.stocksbrowser.ui.theme.darkRed
 import com.juraj.stocksbrowser.utils.format
 import com.juraj.stocksbrowser.utils.toDeltaIndicator
 
-data class HomeScreenState(
+data class HomeState(
     val isLoading: Boolean = true,
     val isSearching: Boolean = false,
     val sections: Map<ScreenSection.Type, ScreenSection> = emptyMap()
-)
+) {
+    fun setSearching(isSearching: Boolean): HomeState {
+        val sections = sections.toMutableMap()
+        sections.remove(ScreenSection.Type.SearchResults)
+        sections.keys.forEach { key ->
+            val isVisible = if (isSearching)
+                key == ScreenSection.Type.SearchResults
+            else
+                key != ScreenSection.Type.SearchResults
+
+            sections[key]?.let { oldSection ->
+                sections[key] = oldSection.copy(isVisible = isVisible)
+            }
+        }
+        return copy(isSearching = isSearching, sections = sections)
+    }
+
+    fun updateSection(
+        type: ScreenSection.Type,
+        data: List<ListItem>
+    ): HomeState {
+        val sections = sections.toMutableMap()
+        val header = type.toHeader()
+        if (data.isEmpty()) {
+            sections.remove(type)
+        } else {
+            sections[type] = ScreenSection(
+                isVisible = if (isSearching)
+                    type == ScreenSection.Type.SearchResults
+                else
+                    type != ScreenSection.Type.SearchResults,
+                data = if (header != null) listOf(header).plus(data) else data
+            )
+        }
+        return copy(sections = sections)
+    }
+}
 
 data class ScreenSection(val isVisible: Boolean, val data: List<ListItem>) {
     enum class Type(val order: Int) {
@@ -24,6 +58,13 @@ data class ScreenSection(val isVisible: Boolean, val data: List<ListItem>) {
         MostPopularStocks(2),
         MostPopularEtfs(3),
     }
+}
+
+fun ScreenSection.Type.toHeader(): ListItem? = when (this) {
+    ScreenSection.Type.SearchResults -> null
+    ScreenSection.Type.Favorites -> ListItem.HeaderItem(HeaderType.Favorites)
+    ScreenSection.Type.MostPopularStocks -> ListItem.HeaderItem(HeaderType.MostPopularStocks)
+    ScreenSection.Type.MostPopularEtfs -> ListItem.HeaderItem(HeaderType.MostPopularEtfs)
 }
 
 sealed class HomeScreenSideEffect {
@@ -83,18 +124,3 @@ fun InstrumentEntity.toInstrumentItem() = ListItem.InstrumentItem(
     percentageChange = percentageChange.format(2) + "%",
     deltaIndicator = percentageChange.toDeltaIndicator()
 )
-
-fun StockEntity.extractDetails(): List<Pair<String, String>> {
-    return mutableListOf<Pair<String, String>>().apply {
-        if (industry.isNotBlank()) add(Pair("Industry", industry))
-        if (sector.isNotBlank()) add(Pair("Sector", sector))
-        if (country.isNotBlank()) add(Pair("Country", country))
-        if (ipoYear != null) add(Pair("IPO Year", ipoYear.toString()))
-    }
-}
-
-fun EtfEntity.extractDetails(): List<Pair<String, String>> {
-    return mutableListOf<Pair<String, String>>().apply {
-        add(Pair("Name", companyName))
-    }
-}

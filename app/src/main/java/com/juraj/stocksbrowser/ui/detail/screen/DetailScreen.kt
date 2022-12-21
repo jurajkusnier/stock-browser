@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.himanshoe.charty.candle.model.CandleEntry
 import com.juraj.stocksbrowser.ui.common.showErrorSnackBar
@@ -36,39 +37,39 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
-fun DetailScreen(viewModel: DetailScreenViewModel, navController: NavController) {
+fun DetailScreen(navController: NavController, viewModel: DetailViewModel = hiltViewModel()) {
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
     val viewState by viewModel.collectAsState()
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is DetailScreenSideEffect.NavigateHome -> navController.popBackStack()
-            DetailScreenSideEffect.NetworkError ->
+            is DetailSideEffect.NavigateHome -> navController.popBackStack()
+            DetailSideEffect.NetworkError ->
                 coroutineScope
                     .showErrorSnackBar(scaffoldState.snackbarHostState) {
-                        viewModel.postIntent(DetailScreenIntent.Refresh)
+                        viewModel.handleIntent(DetailIntent.Refresh)
                     }
         }
     }
 
-    DetailScreen(viewState, scaffoldState, viewModel::postIntent)
+    DetailScreen(viewState, scaffoldState, viewModel::handleIntent)
 }
 
 @Composable
 private fun DetailScreen(
-    state: DetailScreenState,
+    state: DetailState,
     scaffoldState: ScaffoldState,
-    action: (DetailScreenIntent) -> Unit
+    action: (DetailIntent) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val scrolledListState by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0f } }
     Scaffold(
         topBar = {
             TopAppBarDetails(state.instrument, scrolledListState, state.isFavorite, {
-                action(DetailScreenIntent.NavigateHome)
+                action(DetailIntent.NavigateHome)
             }, {
-                action(DetailScreenIntent.ToggleFav)
+                action(DetailIntent.ToggleFav)
             })
         },
         scaffoldState = scaffoldState
@@ -95,7 +96,7 @@ private fun DetailScreen(
 
                 item {
                     IntervalButtons(state.rangeIntervals) {
-                        action(DetailScreenIntent.SelectRangeInterval(it))
+                        action(DetailIntent.SelectRangeInterval(it))
                     }
                 }
 
@@ -121,7 +122,7 @@ private fun DetailScreen(
 fun DetailScreen_Preview() {
     StocksBrowserTheme {
         DetailScreen(
-            DetailScreenState(
+            DetailState(
                 instrument = ListItem.InstrumentItem(
                     symbol = "IBM",
                     name = "International Business Machines Corp",
@@ -138,10 +139,10 @@ fun DetailScreen_Preview() {
                 yAxis = listOf("12", "6", "0"),
                 rangeIntervals = GetRangeIntervalsUseCase().invoke()
                     .mapIndexed { index, rangeInterval -> rangeInterval.toSelectable(index == 1) },
-                details = listOf(
-                    Pair("Industry", "Data mining"),
-                    Pair("Sector", "Internet and Telecommunication"),
-                    Pair("IPO Year", "2019")
+                details = mapOf(
+                    "Industry" to "Data mining",
+                    "Sector" to "Internet and Telecommunication",
+                    "IPO Year" to "2019"
                 )
             ),
             rememberScaffoldState()

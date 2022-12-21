@@ -14,6 +14,10 @@ data class EtfEntity(
     override val percentageChange: Double,
 ) : InstrumentEntity {
     override fun getType() = InstrumentType.ETF
+    override fun getDetails() =
+        mutableMapOf<String, String>().apply {
+            set("Name", companyName)
+        }
 }
 
 fun EtfDto.toEtfEntity() = EtfEntity(
